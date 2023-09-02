@@ -11,7 +11,7 @@ ModelType = TypeVar('ModelType', bound=BaseAlgorithm)
 
 class Trainer:
 
-    def __init__(self, model: ModelType, directory_path: Optional[str] = None):
+    def __init__(self, model: ModelType, target_step: int = 5_000, directory_path: Optional[str] = None):
         self.model = model
         if not directory_path:
             directory_path = get_model_directory()
@@ -20,16 +20,15 @@ class Trainer:
         self.save_directory = directory_path
         self.log_path = directory_path + '/logs'
 
-        self.target_training_step = 5_000
-        self.log_frequency = 500
+        self.target_training_step = target_step
         self.logger = configure(self.log_path, ["stdout", "csv", "tensorboard"])
         self.model.set_logger(self.logger)
 
     def train(self):
         self.model.learn(
             total_timesteps=int(self.target_training_step),
-            log_interval=100,  # episode number
+            log_interval=10,  # episode number
         )
-        self.model.save(self.save_directory + 'model')
-        self.model.save_replay_buffer(self.save_directory + 'replay_buffer')
+        self.model.save(self.save_directory + '/model')
+        self.model.save_replay_buffer(self.save_directory + '/replay_buffer')
 

@@ -211,13 +211,12 @@ class BulletSim(Simulation):
             length: float,
             width: float,
             height: float,
-            x_offset: float = 0.0,
     ) -> None:
         """Create a fixed table. Top is z=0, centered in y."""
         self.create_box(
             body_name="table",
             half_extents=np.array([length, width, height]) / 2,
-            position=np.array([x_offset, 0.0, height / 2]),
+            position=np.array([length/2, 0.0, - height / 2]),
             rgba_color=np.array([0.95, 0.95, 0.95, 1]),
         )
 
@@ -242,5 +241,5 @@ class BulletSim(Simulation):
 
     def create_scene(self):
         self.create_plane(z_offset=-0.4)
-        self.create_table(length=1.3, width=2, height=0.001, x_offset=0.5)
+        self.create_table(length=1.3, width=2, height=0.1)
         self.create_sphere(np.zeros(3))

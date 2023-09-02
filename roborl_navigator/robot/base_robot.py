@@ -10,19 +10,24 @@ Sim = TypeVar('Sim', bound=Simulation)
 
 class Robot(ABC):
 
-    def __init__(self, sim: Sim) -> None:
+    def __init__(self, sim: Sim, orientation_task=False) -> None:
         n_action = 7  # DOF
         self.action_space = spaces.Box(-1.0, 1.0, shape=(n_action,), dtype=np.float32)
         self.sim = sim
-        self.neutral_joint_values = np.array([0.0, -0.78, 0.0, -2.35, 0.0, 1.57, 0.78])
+        # self.neutral_joint_values = np.array([0.0, -0.78, 0.0, -2.35, 0.0, 1.57, 0.78])
+        self.neutral_joint_values = np.array([0.0, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77])
+        self.orientation_task = orientation_task
 
     def get_obs(self) -> np.ndarray:
-        return np.concatenate(
-            [
-                np.array(self.get_ee_position()),
-                np.array(self.get_ee_orientation()),
-            ]
-        )
+        if self.orientation_task:
+            return np.concatenate(
+                [
+                    np.array(self.get_ee_position()),
+                    np.array(self.get_ee_orientation()),
+                ]
+            )
+        else:
+            return np.array(self.get_ee_position())
 
     def reset(self) -> None:
         self.set_joint_neutral()

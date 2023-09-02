@@ -4,7 +4,7 @@ from typing import (
 )
 
 import numpy as np
-from roborl_navigator.utils import distance
+from roborl_navigator.utils import regular_distance, distance
 
 
 class Reach:
@@ -14,7 +14,7 @@ class Reach:
         robot,
         reward_type="sparse",
         distance_threshold=0.1,
-        goal_range=0.5,
+        goal_range=0.3,
         orientation_task=False,
         custom_reward=False,
     ) -> None:
@@ -27,8 +27,9 @@ class Reach:
         self.custom_reward = custom_reward
         self.distance_threshold = distance_threshold
 
-        self.goal_range_low = np.array([-goal_range / 2 + 0.7, -goal_range / 2, 0.73])
-        self.goal_range_high = np.array([goal_range / 2 + 0.7, goal_range / 2, 0.73 + goal_range / 2])
+        # min X can be 0.07
+        self.goal_range_low = np.array([0.5 - (goal_range / 2), -goal_range / 2, 0.0])
+        self.goal_range_high = np.array([0.5 + (goal_range / 2), goal_range / 2, goal_range / 2])
         self.orientation_range_low = np.array([-3.0, -0.8, -1.75])
         self.orientation_range_high = np.array([-2.0, 0.4, 0.0])
 
@@ -45,12 +46,12 @@ class Reach:
         ee_position = np.array(self.robot.get_ee_position())
         if self.orientation_task:
             ee_orientation = np.array(self.robot.get_ee_orientation())
-        else:
-            ee_orientation = np.zeros(3)
-        return np.concatenate([
-            ee_position,
-            ee_orientation,
-        ])
+            return np.concatenate([
+                ee_position,
+                ee_orientation,
+            ])
+        return ee_position
+
 
     def reset(self) -> None:
         self.goal = self._sample_goal()
@@ -60,22 +61,20 @@ class Reach:
         position = np.random.uniform(self.goal_range_low, self.goal_range_high)
         if self.orientation_task:
             orientation = np.random.uniform(self.orientation_range_low, self.orientation_range_high)
-        else:
-            orientation = np.zeros(3)
-        return np.concatenate(
-            [
+            return np.concatenate((
                 position,
                 orientation,
-            ]
-        ).astype(np.float32)
+            )).astype(np.float32)
+        return position
+
 
     def is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray) -> np.ndarray:
-        d = distance(achieved_goal, desired_goal)
+        d = distance(achieved_goal, desired_goal, self.orientation_task)
         result = np.array(d < self.distance_threshold, dtype=bool)
         return result
 
     def compute_reward(self, achieved_goal, desired_goal, info: Dict[str, Any]) -> np.ndarray:
-        d = distance(achieved_goal, desired_goal, self.custom_reward)
+        d = distance(achieved_goal, desired_goal, self.orientation_task)
         if self.reward_type == "sparse":
             return -np.array(d > self.distance_threshold, dtype=np.float32)
         else:

@@ -50,13 +50,6 @@ class BulletPanda(Robot):
         target_arm_angles = current_arm_joint_angles + joint_actions
         return target_arm_angles
 
-    def get_obs(self) -> np.ndarray:
-        return np.concatenate(
-            [
-                np.array(self.get_ee_position()),
-                np.array(self.get_ee_orientation()),
-            ]
-        )
 
     def reset(self) -> None:
         self.set_joint_neutral()
