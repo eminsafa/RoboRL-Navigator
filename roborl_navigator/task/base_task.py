@@ -65,19 +65,6 @@ class Task(ABC):
         if self.orientation_task:
             self.sim.set_base_pose("target_box", self.goal[:3], euler_to_quaternion(self.goal[3:]))
 
-    def _sample_goal(self) -> np.ndarray:
-        position = np.random.uniform(self.goal_range_low, self.goal_range_high)
-        if self.orientation_task:
-            orientation = np.random.uniform(self.orientation_range_low, self.orientation_range_high)
-        else:
-            orientation = np.zeros(3)
-        return np.concatenate(
-            [
-                position,
-                orientation,
-            ]
-        ).astype(np.float32)
-
     def is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray) -> np.ndarray:
         d = distance(achieved_goal, desired_goal)
         result = np.array(d < self.distance_threshold, dtype=bool)
