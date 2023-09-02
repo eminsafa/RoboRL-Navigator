@@ -1,6 +1,7 @@
-from .enums import PlannerResult
-from .distance import *
 from .converter import *
+from .distance import *
+from .enums import *
+from .formulas import *
 from .wrapper import *
 from .path_helper import (
     get_assets_path,

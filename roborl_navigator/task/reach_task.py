@@ -4,7 +4,7 @@ from typing import (
 )
 
 import numpy as np
-from roborl_navigator.utils import distance
+from roborl_navigator.utils import distance, euler_to_quaternion
 
 
 class Reach:
@@ -38,6 +38,12 @@ class Reach:
     def _create_scene(self) -> None:
         self.sim.create_scene()
 
+    def reset(self) -> None:
+        self.goal = self._sample_goal()
+        self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
+        if self.orientation_task:
+            self.sim.set_base_pose("target_box", self.goal[:3], euler_to_quaternion(self.goal[3:]))
+
     def get_obs(self) -> np.ndarray:
         return np.array([])  # no tasak-specific observation
 
@@ -51,10 +57,6 @@ class Reach:
             ee_position,
             ee_orientation,
         ])
-
-    def reset(self) -> None:
-        self.goal = self._sample_goal()
-        self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
 
     def _sample_goal(self) -> np.ndarray:
         position = np.random.uniform(self.goal_range_low, self.goal_range_high)

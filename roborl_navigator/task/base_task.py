@@ -3,7 +3,7 @@ from typing import Dict, Any
 from abc import ABC, abstractmethod
 
 import numpy as np
-from roborl_navigator.utils import distance
+from roborl_navigator.utils import distance, euler_to_quaternion
 
 
 class Task(ABC):
@@ -62,6 +62,8 @@ class Task(ABC):
     def reset(self) -> None:
         self.goal = self._sample_goal()
         self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
+        if self.orientation_task:
+            self.sim.set_base_pose("target_box", self.goal[:3], euler_to_quaternion(self.goal[3:]))
 
     def _sample_goal(self) -> np.ndarray:
         position = np.random.uniform(self.goal_range_low, self.goal_range_high)
