@@ -7,6 +7,7 @@ from roborl_navigator.environment import BaseEnv
 from roborl_navigator.simulation.bullet import BulletSim
 from roborl_navigator.robot.bullet_panda_robot import BulletPanda
 from roborl_navigator.task.reach_task import Reach
+from roborl_navigator.utils import euler_to_quaternion
 
 
 class FrankaBulletEnv(BaseEnv):
@@ -14,7 +15,7 @@ class FrankaBulletEnv(BaseEnv):
 
     def __init__(self, render_mode="human", orientation_task=False, distance_threshold=0.05, custom_reward=False) -> None:
         self.sim = BulletSim(render_mode=render_mode, renderer="Tiny", n_substeps=30, orientation_task=orientation_task)
-        self.robot = BulletPanda(self.sim)
+        self.robot = BulletPanda(self.sim, orientation_task=orientation_task)
         self.task = Reach(
             self.sim,
             self.robot,
@@ -66,6 +67,8 @@ class FrankaBulletEnv(BaseEnv):
         truncated = False
         info = {"is_success": terminated}
         reward = float(self.task.compute_reward(observation["achieved_goal"], self.task.get_goal(), info))
+        # self.task.goal[3:] = observation["observation"][3:]
+        # self.sim.set_base_pose("target_box", self.task.goal[:3], orientation=self.task.goal[3:])
         return observation, reward, terminated, truncated, info
 
     def close(self) -> None:

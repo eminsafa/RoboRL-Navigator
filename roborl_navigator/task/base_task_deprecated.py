@@ -63,7 +63,10 @@ class Task(ABC):
         self.goal = self._sample_goal()
         self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
         if self.orientation_task:
-            self.sim.set_base_pose("target_box", self.goal[:3], euler_to_quaternion(self.goal[3:]))
+            roll, pitch, yaw = self.goal[3:]
+            roll *= 1.05
+            ori = np.array((roll, pitch, yaw))
+            self.sim.set_base_pose("target_box", self.goal[:3], euler_to_quaternion())
 
     def is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray) -> np.ndarray:
         d = distance(achieved_goal, desired_goal)

@@ -244,15 +244,16 @@ class BulletSim(Simulation):
     def create_target_box(self, position):
         self.create_box(
             body_name="target_box",
-            half_extents=np.array([0.02, 0.01, 0.05]) / 2,
+            half_extents=np.array([0.01, 0.02, 0.05]) / 2,
             position=position,
             rgba_color=np.array([0.2, 0.95, 0.2, 1]),
         )
-        objectId = self._bodies_idx["target_box"]
-        line_length = .5  # Length of the lines
-        p.addUserDebugLine([0, 0, 0], [line_length, 0, 0], [1, 0, 0], parentObjectUniqueId=objectId, parentLinkIndex=-1)
-        p.addUserDebugLine([0, 0, 0], [0, line_length, 0], [0, 1, 0], parentObjectUniqueId=objectId, parentLinkIndex=-1)
-        p.addUserDebugLine([0, 0, 0], [0, 0, line_length], [0, 0, 1], parentObjectUniqueId=objectId, parentLinkIndex=-1)
+        # Target Box Orientation Lines for Debug
+        # oid = self._bodies_idx["target_box"]
+        # line_length = .5  # Length of the lines
+        # p.addUserDebugLine([0, 0, 0], [line_length, 0, 0], [1, 0, 0], parentObjectUniqueId=oid, parentLinkIndex=-1)
+        # p.addUserDebugLine([0, 0, 0], [0, line_length, 0], [0, 1, 0], parentObjectUniqueId=oid, parentLinkIndex=-1)
+        # p.addUserDebugLine([0, 0, 0], [0, 0, line_length], [0, 0, 1], parentObjectUniqueId=oid, parentLinkIndex=-1)
 
     def create_scene(self):
         self.create_plane(z_offset=-0.4)
