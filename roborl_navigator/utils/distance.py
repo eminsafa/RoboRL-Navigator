@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+from .formulas import spherical_distance
 
 
 def regular_distance(a: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -35,10 +36,7 @@ def custom_distance(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     # max: 1.24 mean 0.2
     pd = np.linalg.norm(a[:3] - b[:3])  # position_distance
     # Orientation: max distance = 6.38, mean = 1.52
-    ox = abs(a[3] - b[3])
-    oy = abs(a[4] - b[4])
-    oz = abs(a[5] - b[5])
-    od = math.sqrt(ox**2 + oy**2 + oz**2) / 7.0  # to scale
+    od = spherical_distance(a[4:], b[4:]) * 2
     return pd * .5 + od * .5
 
 

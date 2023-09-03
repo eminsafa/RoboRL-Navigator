@@ -10,9 +10,9 @@ from roborl_navigator.utils import (
 
 class BulletPanda(Robot):
 
-    def __init__(self, sim: BulletSim) -> None:
+    def __init__(self, sim: BulletSim, orientation_task: bool = False) -> None:
 
-        super().__init__(sim)
+        super().__init__(sim, orientation_task)
 
         # Common but different values
         self.joint_indices = np.array([0, 1, 2, 3, 4, 5, 6])
@@ -49,7 +49,6 @@ class BulletPanda(Robot):
         current_arm_joint_angles = self.get_joint_angles()
         target_arm_angles = current_arm_joint_angles + joint_actions
         return target_arm_angles
-
 
     def reset(self) -> None:
         self.set_joint_neutral()

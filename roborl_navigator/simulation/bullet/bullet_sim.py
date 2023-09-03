@@ -17,9 +17,11 @@ class BulletSim(Simulation):
             n_substeps: int = 20,
             background_color: Optional[np.ndarray] = None,
             renderer: str = "Tiny",
+            orientation_task: bool = False,
     ) -> None:
         super().__init__(render_mode, n_substeps)
 
+        self.orientation_task = orientation_task
         background_color = background_color if background_color is not None else np.array([61.0, 61.0, 61.0])
         self.background_color = background_color.astype(np.float32) / 255
         options = "--background_color_red={} --background_color_green={} --background_color_blue={}".format(
@@ -226,7 +228,7 @@ class BulletSim(Simulation):
         visual_kwargs = {
             "radius": radius,
             "specularColor": np.zeros(3),
-            "rgbaColor": np.array([0.9, 0.1, 0.1, 0.85]),
+            "rgbaColor": np.array([0.9, 0.1, 0.1, 0.75]),
         }
         collision_kwargs = {"radius": radius}
         self._create_geometry(
@@ -239,7 +241,23 @@ class BulletSim(Simulation):
             collision_kwargs=collision_kwargs,
         )
 
+    def create_target_box(self, position):
+        self.create_box(
+            body_name="target_box",
+            half_extents=np.array([0.01, 0.02, 0.05]) / 2,
+            position=position,
+            rgba_color=np.array([0.2, 0.95, 0.2, 1]),
+        )
+        # Target Box Orientation Lines for Debug
+        # oid = self._bodies_idx["target_box"]
+        # line_length = .5  # Length of the lines
+        # p.addUserDebugLine([0, 0, 0], [line_length, 0, 0], [1, 0, 0], parentObjectUniqueId=oid, parentLinkIndex=-1)
+        # p.addUserDebugLine([0, 0, 0], [0, line_length, 0], [0, 1, 0], parentObjectUniqueId=oid, parentLinkIndex=-1)
+        # p.addUserDebugLine([0, 0, 0], [0, 0, line_length], [0, 0, 1], parentObjectUniqueId=oid, parentLinkIndex=-1)
+
     def create_scene(self):
         self.create_plane(z_offset=-0.4)
         self.create_table(length=1.3, width=2, height=0.1)
         self.create_sphere(np.zeros(3))
+        if self.orientation_task:
+            self.create_target_box(np.zeros(3))
