@@ -30,8 +30,8 @@ class Reach:
         # min X can be 0.07
         self.goal_range_low = np.array([0.5 - (goal_range / 2), -goal_range / 2, 0.0])
         self.goal_range_high = np.array([0.5 + (goal_range / 2), goal_range / 2, goal_range / 2])
-        self.orientation_range_low = np.array([-3, -0.8, 0.0])
-        self.orientation_range_high = np.array([-2, 0.4, 0.0])
+        self.orientation_range_low = np.array([-3, -0.8])
+        self.orientation_range_high = np.array([-2, 0.4])
 
         with self.sim.no_rendering():
             self._create_scene()
@@ -43,7 +43,8 @@ class Reach:
         self.goal = self._sample_goal()
         self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
         if self.orientation_task:
-            self.sim.set_base_pose("target_box", self.goal[:3], euler_to_quaternion(self.goal[3:]))
+            goal_orientation = self.sim.physics_client.getQuaternionFromEuler([self.goal[3], self.goal[4], 0])
+            self.sim.set_base_pose("target_orientation_mark", self.goal[:3], goal_orientation)
 
     def get_obs(self) -> np.ndarray:
         return np.array([])  # no tasak-specific observation
@@ -51,7 +52,7 @@ class Reach:
     def get_achieved_goal(self) -> np.ndarray:
         ee_position = np.array(self.robot.get_ee_position())
         if self.orientation_task:
-            ee_orientation = np.array(self.robot.get_ee_orientation())
+            ee_orientation = np.array(self.robot.get_ee_orientation())[:2]
             return np.concatenate([
                 ee_position,
                 ee_orientation,

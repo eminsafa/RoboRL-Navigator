@@ -1,3 +1,5 @@
+import math
+import time
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
@@ -40,6 +42,9 @@ class FrankaBulletEnv(BaseEnv):
                 yaw=self.render_yaw,
                 pitch=self.render_pitch,
             )
+        self.temp = None
+        self.pitch = None
+        self.a = None
 
     def reset(
             self, seed: Optional[int] = None, options: Optional[dict] = None
@@ -67,8 +72,6 @@ class FrankaBulletEnv(BaseEnv):
         truncated = False
         info = {"is_success": terminated}
         reward = float(self.task.compute_reward(observation["achieved_goal"], self.task.get_goal(), info))
-        # self.task.goal[3:] = observation["observation"][3:]
-        # self.sim.set_base_pose("target_box", self.task.goal[:3], orientation=self.task.goal[3:])
         return observation, reward, terminated, truncated, info
 
     def close(self) -> None:

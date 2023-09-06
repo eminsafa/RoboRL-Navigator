@@ -23,7 +23,7 @@ class Robot(ABC):
             return np.concatenate(
                 [
                     np.array(self.get_ee_position()),
-                    np.array(self.get_ee_orientation()),
+                    np.array(self.get_ee_orientation())[:2],
                 ]
             )
         else:

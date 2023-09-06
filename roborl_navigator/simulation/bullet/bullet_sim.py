@@ -41,7 +41,6 @@ class BulletSim(Simulation):
         self.physics_client = bc.BulletClient(connection_mode=self.connection_mode, options=options)
         self.physics_client.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         self.physics_client.configureDebugVisualizer(p.COV_ENABLE_MOUSE_PICKING, 0)
-
         self.n_substeps = n_substeps
         self.timestep = 1.0 / 500
         self.physics_client.setTimeStep(self.timestep)
@@ -230,7 +229,6 @@ class BulletSim(Simulation):
             "specularColor": np.zeros(3),
             "rgbaColor": np.array([0.9, 0.1, 0.1, 0.75]),
         }
-        collision_kwargs = {"radius": radius}
         self._create_geometry(
             "target",
             geom_type=self.physics_client.GEOM_SPHERE,
@@ -238,26 +236,34 @@ class BulletSim(Simulation):
             position=position,
             ghost=True,
             visual_kwargs=visual_kwargs,
-            collision_kwargs=collision_kwargs,
         )
 
-    def create_target_box(self, position):
-        self.create_box(
-            body_name="target_box",
-            half_extents=np.array([0.01, 0.02, 0.05]) / 2,
+    def create_orientation_mark(self, position):
+        radius = 0.008
+        visual_kwargs = {
+            "radius": radius,
+            "length": 0.08,
+            "specularColor": np.zeros(3),
+            "rgbaColor": np.array([0.1, 0.8, 0.1, 0.8]),
+        }
+        self._create_geometry(
+            "target_orientation_mark",
+            geom_type=self.physics_client.GEOM_CYLINDER,
+            mass=0.0,
             position=position,
-            rgba_color=np.array([0.2, 0.95, 0.2, 1]),
+            ghost=True,
+            visual_kwargs=visual_kwargs,
         )
         # Target Box Orientation Lines for Debug
-        # oid = self._bodies_idx["target_box"]
-        # line_length = .5  # Length of the lines
-        # p.addUserDebugLine([0, 0, 0], [line_length, 0, 0], [1, 0, 0], parentObjectUniqueId=oid, parentLinkIndex=-1)
-        # p.addUserDebugLine([0, 0, 0], [0, line_length, 0], [0, 1, 0], parentObjectUniqueId=oid, parentLinkIndex=-1)
-        # p.addUserDebugLine([0, 0, 0], [0, 0, line_length], [0, 0, 1], parentObjectUniqueId=oid, parentLinkIndex=-1)
+        # oid = self._bodies_idx["panda"]
+        # line_length = 30  # Length of the lines
+        # p.addUserDebugLine([0, 0, 0], [line_length, 0, 0], [1, 0, 0], parentObjectUniqueId=oid, parentLinkIndex=10)
+        # p.addUserDebugLine([0, 0, 0], [0, line_length, 0], [0, 1, 0], parentObjectUniqueId=oid, parentLinkIndex=10)  # right
+        # p.addUserDebugLine([0, 0, 0], [0, 0, line_length], [0, 0, 1], parentObjectUniqueId=oid, parentLinkIndex=10)  # z
 
     def create_scene(self):
         self.create_plane(z_offset=-0.4)
         self.create_table(length=1.3, width=2, height=0.1)
         self.create_sphere(np.zeros(3))
         if self.orientation_task:
-            self.create_target_box(np.zeros(3))
+            self.create_orientation_mark(np.zeros(3))

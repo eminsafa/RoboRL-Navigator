@@ -36,7 +36,7 @@ def custom_distance(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     # max: 1.24 mean 0.2
     pd = np.linalg.norm(a[:3] - b[:3])  # position_distance
     # Orientation: max distance = 6.38, mean = 1.52
-    od = spherical_distance(a[4:], b[4:]) * 2
+    od = spherical_distance(a[3:], b[3:]) * 2
     return pd * .5 + od * .5
 
 
