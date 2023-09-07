@@ -7,7 +7,7 @@ from typing import (
 
 import numpy as np
 
-from gym.utils import seeding
+from gymnasium.utils import seeding
 
 from roborl_navigator.environment import BaseEnv
 from roborl_navigator.simulation.ros.ros_sim import ROSSim
@@ -18,7 +18,7 @@ from roborl_navigator.task.reach_task import Reach
 class FrankaROSEnv(BaseEnv):
 
     def __init__(self, orientation_task=False, distance_threshold=0.05, custom_reward=False) -> None:
-        self.sim = ROSSim()
+        self.sim = ROSSim(orientation_task=orientation_task)
         self.robot = ROSRobot(self.sim)
         self.task = Reach(
             self.sim,
@@ -29,21 +29,6 @@ class FrankaROSEnv(BaseEnv):
             custom_reward=custom_reward,
         )
         super().__init__()
-
-        self.render_width = 700
-        self.render_height = 400
-        self.render_target_position = (np.array([0.0, 0.0, 0.72]))
-        self.render_distance = 2
-        self.render_yaw = 45
-        self.render_pitch = -30
-        self.render_roll = 0
-        with self.sim.no_rendering():
-            self.sim.place_camera(
-                target_position=self.render_target_position,
-                distance=self.render_distance,
-                yaw=self.render_yaw,
-                pitch=self.render_pitch,
-            )
 
     def reset(
             self, seed: Optional[int] = None, options: Optional[dict] = None
@@ -61,7 +46,6 @@ class FrankaROSEnv(BaseEnv):
         truncated = self.robot.set_action(action)
         observation = self._get_obs()
         terminated = bool(self.task.is_success(observation["achieved_goal"], self.task.get_goal()))
-        truncated = False
         info = {"is_success": terminated}
         reward = float(self.task.compute_reward(observation["achieved_goal"], self.task.get_goal(), info))
         return observation, reward, terminated, truncated, info

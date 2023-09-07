@@ -1,8 +1,9 @@
 import numpy as np
-from math import cos, sin, sqrt, atan2, asin, pi
+from math import cos, sin, sqrt, atan2, asin
+from typing import List, Union
 
 
-def euler_to_quaternion(orientation: np.ndarray) -> np.ndarray:
+def euler_to_quaternion(orientation: Union[np.ndarray, List[float]]) -> np.ndarray:
     roll = orientation[0]
     pitch = orientation[1]
     yaw = orientation[2]

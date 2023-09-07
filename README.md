@@ -22,6 +22,9 @@ ROS and Gazebo Installation
 # Install ROS
 # Install Gazebo and Packages
 # Private Repo
+
+cd RoboRL-Navigator/
+export PYTHONPATH=$PYTHONPATH:$(pwd)
 ```
 
 GraspNet Installation
