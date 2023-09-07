@@ -10,7 +10,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-models/roborl-navigator
+models/roborl-navigator/
 env/
 build/
 develop-eggs/
