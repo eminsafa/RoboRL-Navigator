@@ -19,7 +19,7 @@ class FrankaROSEnv(BaseEnv):
 
     def __init__(self, orientation_task=False, distance_threshold=0.05, custom_reward=False) -> None:
         self.sim = ROSSim(orientation_task=orientation_task)
-        self.robot = ROSRobot(self.sim)
+        self.robot = ROSRobot(self.sim, orientation_task=orientation_task)
         self.task = Reach(
             self.sim,
             self.robot,

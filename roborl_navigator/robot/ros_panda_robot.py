@@ -19,11 +19,11 @@ class ROSRobot(Robot):
     def __init__(self, sim: ROSSim, orientation_task: bool = False) -> None:
         super().__init__(sim, orientation_task)
 
-        self.group = moveit_commander.MoveGroupCommander("panda_manipulator")
+        self.move_group = moveit_commander.MoveGroupCommander("panda_manipulator")
         self.status_queue = deque(maxlen=5)
 
     def get_ee_position(self) -> np.ndarray:
-        position = self.group.get_current_pose().pose.position
+        position = self.move_group.get_current_pose().pose.position
         return np.array(
             [
                 position.x,
@@ -33,7 +33,7 @@ class ROSRobot(Robot):
         ).astype(np.float32)
 
     def get_ee_orientation(self) -> np.ndarray:
-        orientation = self.group.get_current_pose().pose.orientation
+        orientation = self.move_group.get_current_pose().pose.orientation
         return np.array(
             euler_from_quaternion(
                 [
@@ -53,7 +53,7 @@ class ROSRobot(Robot):
         return self.get_joint_angles() + joint_actions
 
     def get_joint_angles(self) -> np.ndarray:
-        return np.array(self.group.get_current_joint_values())
+        return np.array(self.move_group.get_current_joint_values())
 
     def set_action(self, action: np.ndarray) -> Optional[bool]:
         action = action.copy()
@@ -86,16 +86,16 @@ class ROSRobot(Robot):
 
     def control_joints(self, joint_values: np.ndarray) -> PlannerResult:
         try:
-            success, plan, _, _ = self.group.plan(joint_values)
+            success, plan, _, _ = self.move_group.plan(joint_values)
         except moveit_commander.MoveItCommanderException:
             return PlannerResult.MOVEIT_ERROR
         if not success:
             return PlannerResult.COLLISION
         try:
-            self.group.go(joint_values, True)
+            self.move_group.go(joint_values, True)
         except moveit_commander.MoveItCommanderException:
             return PlannerResult.MOVEIT_ERROR
-        self.group.stop()
+        self.move_group.stop()
         return PlannerResult.SUCCESS
 
     # ROS Specific

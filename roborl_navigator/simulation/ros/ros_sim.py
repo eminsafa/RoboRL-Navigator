@@ -64,7 +64,7 @@ class ROSSim(Simulation):
 
     def set_base_pose(self, body: str, position: np.ndarray, orientation: np.ndarray) -> None:
         rospy.wait_for_service('/gazebo/set_model_state')
-        for i in range(50):  # To avoid latency bug
+        for i in range(100):  # To avoid latency bug
             state_msg = ModelState()
             state_msg.model_name = body
             state_msg.pose.position.x = position[0]

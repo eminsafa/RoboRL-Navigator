@@ -14,7 +14,6 @@ class Robot(ABC):
         n_action = 7  # DOF
         self.action_space = spaces.Box(-1.0, 1.0, shape=(n_action,), dtype=np.float32)
         self.sim = sim
-        # self.neutral_joint_values = np.array([0.0, -0.78, 0.0, -2.35, 0.0, 1.57, 0.78])
         self.neutral_joint_values = np.array([0.0, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77])
         self.orientation_task = orientation_task
 
@@ -26,6 +25,7 @@ class Robot(ABC):
                     np.array(self.get_ee_orientation())[:2],
                 ]
             )
+            return result
         else:
             return np.array(self.get_ee_position())
 
