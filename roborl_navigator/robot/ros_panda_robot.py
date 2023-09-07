@@ -5,7 +5,7 @@ import numpy as np
 
 from roborl_navigator.robot.base_robot import Robot
 from roborl_navigator.simulation.ros.ros_sim import ROSSim
-from roborl_navigator.utils import *
+from roborl_navigator.utils import distance, PlannerResult
 
 try:
     import moveit_commander
@@ -16,42 +16,11 @@ except ImportError:
 
 class ROSRobot(Robot):
 
-    def __init__(self, sim: ROSSim) -> None:
-        super().__init__(sim)
+    def __init__(self, sim: ROSSim, orientation_task: bool = False) -> None:
+        super().__init__(sim, orientation_task)
 
         self.group = moveit_commander.MoveGroupCommander("panda_manipulator")
         self.status_queue = deque(maxlen=5)
-
-    def set_action(self, action: np.ndarray) -> Optional[bool]:
-        action = action.copy()
-        action = np.clip(action, self.action_space.low, self.action_space.high)
-        arm_joint_ctrl = action[:7]
-        target_arm_angles = self.get_target_arm_angles(arm_joint_ctrl)
-
-        stuck = None
-        result = self.go_to_joint_state(target_arm_angles)
-        self.status_queue.append(result)
-
-        if result in [PlannerResult.MOVEIT_ERROR, PlannerResult.COLLISION]:
-            stuck = self.stuck_check()
-            if not stuck:
-                target_arm_angles = self.get_target_arm_angles(arm_joint_ctrl/2)
-                result = self.go_to_joint_state(target_arm_angles)
-
-        if result != PlannerResult.SUCCESS:
-            if stuck:
-                truncated = True
-            else:
-                truncated = False
-        else:
-            truncated = False
-        return truncated
-
-    def set_joint_neutral(self) -> None:
-        self.group.plan(self.neutral_joint_values)
-
-    def get_fingers_width(self) -> float:
-        pass
 
     def get_ee_position(self) -> np.ndarray:
         position = self.group.get_current_pose().pose.position
@@ -81,30 +50,55 @@ class ROSRobot(Robot):
 
     def get_target_arm_angles(self, joint_actions: np.ndarray) -> np.ndarray:
         joint_actions = joint_actions * 0.05  # @todo limit maximum change in position
-        current_arm_joint_angles = np.array(self.get_current_joint_state())
-        target_arm_angles = current_arm_joint_angles + joint_actions
-        return target_arm_angles
+        return self.get_joint_angles() + joint_actions
 
-    def get_current_joint_state(self):
-        return self.group.get_current_joint_values()
+    def get_joint_angles(self) -> np.ndarray:
+        return np.array(self.group.get_current_joint_values())
 
-    def go_to_joint_state(self, joint_goal):
+    def set_action(self, action: np.ndarray) -> Optional[bool]:
+        action = action.copy()
+        action = np.clip(action, self.action_space.low, self.action_space.high)
+        arm_joint_ctrl = action[:7]
+        target_arm_angles = self.get_target_arm_angles(arm_joint_ctrl)
+
+        stuck = None
+        result = self.control_joints(target_arm_angles)
+        self.status_queue.append(result)
+
+        if result in [PlannerResult.MOVEIT_ERROR, PlannerResult.COLLISION]:
+            stuck = self.stuck_check()
+            if not stuck:
+                target_arm_angles = self.get_target_arm_angles(arm_joint_ctrl / 2.0)
+                result = self.control_joints(target_arm_angles)
+
+        if result != PlannerResult.SUCCESS:
+            if stuck:
+                return True
+            else:
+                return False
+        return False
+
+    def set_joint_angles(self, joint_values: np.ndarray) -> PlannerResult:
+        return self.control_joints(joint_values)
+
+    def set_joint_neutral(self) -> None:
+        self.set_joint_angles(self.neutral_joint_values)
+
+    def control_joints(self, joint_values: np.ndarray) -> PlannerResult:
         try:
-            success, plan, _, _ = self.group.plan(joint_goal)
-        except MoveItCommanderException:
-            print(f"{ANSI_PURPLE}>>>>> MoveitCommanderException during planning!{ANSI_RESET}")
+            success, plan, _, _ = self.group.plan(joint_values)
+        except moveit_commander.MoveItCommanderException:
             return PlannerResult.MOVEIT_ERROR
         if not success:
-            print(f"{ANSI_RED}>>>>> Collision Detected!{ANSI_RESET}")
             return PlannerResult.COLLISION
         try:
-            self.group.go(joint_goal, True)
-        except MoveItCommanderException:
-            print(f">>>>> MoveItCommanderException")
+            self.group.go(joint_values, True)
+        except moveit_commander.MoveItCommanderException:
             return PlannerResult.MOVEIT_ERROR
         self.group.stop()
         return PlannerResult.SUCCESS
 
+    # ROS Specific
     def stuck_check(self):
         if not self.status_queue:
             return False

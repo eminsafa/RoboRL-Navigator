@@ -31,10 +31,6 @@ class Simulation(ABC):
     def close(self) -> None:
         pass
 
-    @contextmanager
-    def no_rendering(self) -> Iterator[None]:
-        yield
-
     def render(
         self,
         width: int = 720,
@@ -47,10 +43,22 @@ class Simulation(ABC):
     ) -> Optional[np.ndarray]:
         pass
 
+    @contextmanager
+    def no_rendering(self) -> Iterator[None]:
+        yield
+
+    @abstractmethod
+    def create_scene(self) -> None:
+        pass
+
     @abstractmethod
     def create_sphere(self, position: np.ndarray) -> None:
         pass
 
     @abstractmethod
-    def create_scene(self):
+    def create_orientation_mark(self, position: np.ndarray) -> None:
+        pass
+
+    @abstractmethod
+    def set_base_pose(self, body: str, position: np.ndarray, orientation: np.ndarray) -> None:
         pass

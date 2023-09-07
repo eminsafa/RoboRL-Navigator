@@ -33,14 +33,6 @@ class Robot(ABC):
         self.set_joint_neutral()
 
     @abstractmethod
-    def set_action(self, action: np.ndarray) -> Optional[bool]:
-        pass
-
-    @abstractmethod
-    def set_joint_neutral(self) -> None:
-        pass
-
-    @abstractmethod
     def get_ee_position(self) -> np.ndarray:
         pass
 
@@ -50,4 +42,28 @@ class Robot(ABC):
 
     @abstractmethod
     def get_ee_velocity(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_joint_angles(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_target_arm_angles(self, joint_actions: np.ndarray) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def set_action(self, action: np.ndarray) -> Optional[bool]:
+        pass
+
+    @abstractmethod
+    def set_joint_angles(self, joint_values: np.ndarray) -> None:
+        pass
+
+    @abstractmethod
+    def set_joint_neutral(self) -> None:
+        pass
+
+    @abstractmethod
+    def control_joints(self, joint_values: np.ndarray) -> None:
         pass

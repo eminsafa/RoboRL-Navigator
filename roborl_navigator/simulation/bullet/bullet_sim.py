@@ -94,18 +94,28 @@ class BulletSim(Simulation):
             rgba = np.array(rgba, dtype=np.uint8).reshape((height, width, 4))
             return rgba[..., :3]
 
+    @contextmanager
+    def no_rendering(self) -> Iterator[None]:
+        self.physics_client.configureDebugVisualizer(self.physics_client.COV_ENABLE_RENDERING, 0)
+        yield
+        self.physics_client.configureDebugVisualizer(self.physics_client.COV_ENABLE_RENDERING, 1)
+
+    # Bullet Unique
     def get_link_position(self, body: str, link: int) -> np.ndarray:
         position = self.physics_client.getLinkState(self._bodies_idx[body], link)[0]
         return np.array(position)
 
+    # Bullet Unique
     def get_link_orientation(self, body: str, link: int) -> np.ndarray:
         orientation = self.physics_client.getLinkState(self._bodies_idx[body], link)[1]
         return np.array(orientation)
 
+    # Bullet Unique
     def get_link_velocity(self, body: str, link: int) -> np.ndarray:
         velocity = self.physics_client.getLinkState(self._bodies_idx[body], link, computeLinkVelocity=True)[6]
         return np.array(velocity)
 
+    # Bullet Unique
     def get_joint_angle(self, body: str, joint: int) -> float:
         return self.physics_client.getJointState(self._bodies_idx[body], joint)[0]
 
@@ -116,13 +126,16 @@ class BulletSim(Simulation):
             bodyUniqueId=self._bodies_idx[body], posObj=position, ornObj=orientation
         )
 
+    # Bullet Unique
     def set_joint_angles(self, body: str, joints: np.ndarray, angles: np.ndarray) -> None:
         for joint, angle in zip(joints, angles):
             self.set_joint_angle(body=body, joint=joint, angle=angle)
 
+    # Bullet Unique
     def set_joint_angle(self, body: str, joint: int, angle: float) -> None:
         self.physics_client.resetJointState(bodyUniqueId=self._bodies_idx[body], jointIndex=joint, targetValue=angle)
 
+    # Bullet Unique
     def control_joints(self, body: str, joints: np.ndarray, target_angles: np.ndarray, forces: np.ndarray) -> None:
         self.physics_client.setJointMotorControlArray(
             self._bodies_idx[body],
@@ -132,6 +145,7 @@ class BulletSim(Simulation):
             forces=forces,
         )
 
+    # Bullet Unique
     def place_camera(self, target_position: np.ndarray, distance: float, yaw: float, pitch: float) -> None:
         self.physics_client.resetDebugVisualizerCamera(
             cameraDistance=distance,
@@ -140,41 +154,19 @@ class BulletSim(Simulation):
             cameraTargetPosition=target_position,
         )
 
-    @contextmanager
-    def no_rendering(self) -> Iterator[None]:
-        self.physics_client.configureDebugVisualizer(self.physics_client.COV_ENABLE_RENDERING, 0)
-        yield
-        self.physics_client.configureDebugVisualizer(self.physics_client.COV_ENABLE_RENDERING, 1)
-
+    # Bullet Unique
     def loadURDF(self, body_name: str, **kwargs: Any) -> None:
         self._bodies_idx[body_name] = self.physics_client.loadURDF(**kwargs)
 
-    def create_box(
-            self,
-            body_name: str,
-            half_extents: np.ndarray,
-            position: np.ndarray,
-            rgba_color: Optional[np.ndarray] = None,
-    ) -> None:
-        rgba_color = rgba_color if rgba_color is not None else np.zeros(4)
-        specular_color = np.zeros(3)
-        visual_kwargs = {
-            "halfExtents": half_extents,
-            "specularColor": specular_color,
-            "rgbaColor": rgba_color,
-        }
-        collision_kwargs = {"halfExtents": half_extents}
-        self._create_geometry(
-            body_name,
-            geom_type=self.physics_client.GEOM_BOX,
-            mass=0.0,
-            position=position,
-            ghost=False,
-            visual_kwargs=visual_kwargs,
-            collision_kwargs=collision_kwargs,
-        )
+    # OBJECT MANAGER
+    def create_scene(self):
+        self.create_plane(z_offset=-0.4)
+        self.create_table(length=1.3, width=2, height=0.1)
+        self.create_sphere(np.zeros(3))
+        if self.orientation_task:
+            self.create_orientation_mark(np.zeros(3))
 
-    def _create_geometry(
+    def create_geometry(
             self,
             body_name: str,
             geom_type: int,
@@ -198,6 +190,32 @@ class BulletSim(Simulation):
             basePosition=position,
         )
 
+    def create_box(
+            self,
+            body_name: str,
+            half_extents: np.ndarray,
+            position: np.ndarray,
+            rgba_color: Optional[np.ndarray] = None,
+    ) -> None:
+        rgba_color = rgba_color if rgba_color is not None else np.zeros(4)
+        specular_color = np.zeros(3)
+        visual_kwargs = {
+            "halfExtents": half_extents,
+            "specularColor": specular_color,
+            "rgbaColor": rgba_color,
+        }
+        collision_kwargs = {"halfExtents": half_extents}
+        self.create_geometry(
+            body_name,
+            geom_type=self.physics_client.GEOM_BOX,
+            mass=0.0,
+            position=position,
+            ghost=False,
+            visual_kwargs=visual_kwargs,
+            collision_kwargs=collision_kwargs,
+        )
+
+    # Bullet Unique
     def create_plane(self, z_offset: float) -> None:
         """Create a plane. (Actually, it is a thin box.)"""
         self.create_box(
@@ -207,12 +225,8 @@ class BulletSim(Simulation):
             rgba_color=np.array([0.15, 0.15, 0.15, 1.0]),
         )
 
-    def create_table(
-            self,
-            length: float,
-            width: float,
-            height: float,
-    ) -> None:
+    # Bullet Unique
+    def create_table(self, length: float, width: float, height: float) -> None:
         """Create a fixed table. Top is z=0, centered in y."""
         self.create_box(
             body_name="table",
@@ -229,7 +243,7 @@ class BulletSim(Simulation):
             "specularColor": np.zeros(3),
             "rgbaColor": np.array([0.9, 0.1, 0.1, 0.75]),
         }
-        self._create_geometry(
+        self.create_geometry(
             "target",
             geom_type=self.physics_client.GEOM_SPHERE,
             mass=0.0,
@@ -246,7 +260,7 @@ class BulletSim(Simulation):
             "specularColor": np.zeros(3),
             "rgbaColor": np.array([0.1, 0.8, 0.1, 0.8]),
         }
-        self._create_geometry(
+        self.create_geometry(
             "target_orientation_mark",
             geom_type=self.physics_client.GEOM_CYLINDER,
             mass=0.0,
@@ -261,9 +275,3 @@ class BulletSim(Simulation):
         # p.addUserDebugLine([0, 0, 0], [0, line_length, 0], [0, 1, 0], parentObjectUniqueId=oid, parentLinkIndex=10)  # right
         # p.addUserDebugLine([0, 0, 0], [0, 0, line_length], [0, 0, 1], parentObjectUniqueId=oid, parentLinkIndex=10)  # z
 
-    def create_scene(self):
-        self.create_plane(z_offset=-0.4)
-        self.create_table(length=1.3, width=2, height=0.1)
-        self.create_sphere(np.zeros(3))
-        if self.orientation_task:
-            self.create_orientation_mark(np.zeros(3))

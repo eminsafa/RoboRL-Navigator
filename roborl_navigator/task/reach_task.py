@@ -34,16 +34,16 @@ class Reach:
         self.orientation_range_high = np.array([-2, 0.4])
 
         with self.sim.no_rendering():
-            self._create_scene()
+            self.create_scene()
 
-    def _create_scene(self) -> None:
+    def create_scene(self) -> None:
         self.sim.create_scene()
 
     def reset(self) -> None:
         self.goal = self._sample_goal()
         self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
         if self.orientation_task:
-            goal_orientation = self.sim.physics_client.getQuaternionFromEuler([self.goal[3], self.goal[4], 0])
+            goal_orientation = euler_to_quaternion([self.goal[3], self.goal[4], 0])
             self.sim.set_base_pose("target_orientation_mark", self.goal[:3], goal_orientation)
 
     def get_obs(self) -> np.ndarray:
