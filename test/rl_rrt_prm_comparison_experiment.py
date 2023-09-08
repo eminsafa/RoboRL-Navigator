@@ -1,10 +1,8 @@
 import time
 
-import numpy as np
 from stable_baselines3 import TD3, HerReplayBuffer
 import gymnasium as gym
-import roborl_navigator.environment
-from test.ros_controller import ROSController
+from production.ros_controller import ROSController
 
 
 ros_controller = ROSController()

@@ -1,19 +1,16 @@
 import os
 import sys
-import time
-from abc import ABC
 from typing import Optional
 
+import moveit_commander
 import numpy as np
+import rospy
+from gazebo_msgs.msg import ModelState
+from gazebo_msgs.srv import SpawnModel, SetModelState
+from geometry_msgs.msg import Pose
 
 from roborl_navigator.simulation import Simulation
-
-import rospy
-import moveit_commander
-from roborl_navigator.utils import euler_to_quaternion, quaternion_to_euler
-from geometry_msgs.msg import Pose
-from gazebo_msgs.srv import SpawnModel, SetModelState
-from gazebo_msgs.msg import ModelState
+from roborl_navigator.utils import euler_to_quaternion
 
 
 class ROSSim(Simulation):
@@ -25,7 +22,7 @@ class ROSSim(Simulation):
     ) -> None:
         super().__init__()
         moveit_commander.roscpp_initialize(sys.argv)
-        rospy.init_node('franka_interface', anonymous=True)
+        rospy.init_node('panda_controller', anonymous=True)
         self.scene = moveit_commander.PlanningSceneInterface()
         self.robot = moveit_commander.RobotCommander()
 

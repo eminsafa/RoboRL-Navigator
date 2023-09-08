@@ -34,7 +34,7 @@ class PandaPipeline:
         self.box_name = "yum_yum_link_0"
         self.latest_capture_path = None
         self.latest_grasp_result_path = None
-        self.graspnet_url = "http://localhost:5000/read_file?path={path}"
+        self.graspnet_url = "http://localhost:5000/run?path={path}"
 
     def rgb_callback(self, msg):
         self.rgb_array = self.cv_bridge.imgmsg_to_cv2(msg, "bgr8")
