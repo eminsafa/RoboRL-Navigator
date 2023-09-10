@@ -5,7 +5,7 @@ import numpy as np
 
 from roborl_navigator.robot.base_robot import Robot
 from roborl_navigator.simulation.ros.ros_sim import ROSSim
-from roborl_navigator.utils import distance, PlannerResult
+from roborl_navigator.utils import PlannerResult
 
 try:
     import moveit_commander

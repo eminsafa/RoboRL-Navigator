@@ -13,7 +13,7 @@ env = gym.make(
     distance_threshold=0.05)
 
 model = TD3.load(
-    '/home/juanhernandezvega/dev/RoboRL-Navigator/models/roborl-navigator/TD3_Bullet_0.05_Threshold_200K/model.zip',
+    '/models/roborl-navigator/TD3_Bullet_0.05_Threshold_200K/model.zip',
     env=env,
     replay_buffer_class=HerReplayBuffer,
 )

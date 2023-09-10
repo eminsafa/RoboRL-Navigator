@@ -9,9 +9,9 @@ import roborl_navigator.environment
 from production.ros_controller import ROSController
 
 
-save_path = '/home/juanhernandezvega/dev/RoboRL-Navigator/assets/all_evaluation_1.json'
+save_path = '/assets/evaluation_results/all_evaluation_1.json'
 env = gym.make("RoboRL-Navigator-Franka-ROS", orientation_task=False, custom_reward=False, distance_threshold=0.08)
-m_path = '/home/juanhernandezvega/dev/RoboRL-Navigator/models/roborl-navigator/TD3_Bullet_0.05_Threshold_200K/model.zip'
+m_path = '/models/roborl-navigator/TD3_Bullet_0.05_Threshold_200K/model.zip'
 model = TD3.load(m_path, env=env, replay_buffer_class=HerReplayBuffer)
 ros_controller = ROSController()
 

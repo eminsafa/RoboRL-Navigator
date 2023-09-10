@@ -103,6 +103,6 @@ class ROSSim(Simulation):
             print(f"Model name ({model_name}) not in self.model_paths")
             return False
         if model_name not in self.models:
-            project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+            project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '', '../..', '..'))
             model_path = os.path.join(project_dir, 'assets', 'object_models', self.model_paths[model_name])
             self.models[model_name] = open(model_path, "r+").read()
