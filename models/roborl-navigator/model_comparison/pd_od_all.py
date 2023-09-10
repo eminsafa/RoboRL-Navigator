@@ -7,9 +7,10 @@ distances = [
 
 pd_values = np.array([item[1] for item in distances])
 od_values = np.array([item[0] for item in distances])
-od_values = od_values * 2
+od_values_s = od_values * 2.2
 pd_mean = np.mean(pd_values)
 od_mean = np.mean(od_values)
+od_mean_s = np.mean(od_values_s)
 #
 # # Create two subplots for the histograms
 # plt.figure(figsize=(12, 6))
@@ -45,18 +46,29 @@ def get_color(color):
         pick/255
         for pick in color
     ]
-
-plt.figure(figsize=(10, 8))
-plt.hist([pd_values, od_values], bins=50, edgecolor='white', label=['Position Distance', 'Orientation Distance'], color=[get_color(color_blue), get_color(color_red)])
-plt.title('Histograms of Position and Orientation Distance Values')
-plt.xlabel('Values')
+plt.figure(figsize=(14, 8))
+plt.subplot(1,2,1)
+plt.hist([pd_values, od_values], bins=50, label=['Position Distance', 'Orientation Distance'], color=[get_color(color_blue), get_color(color_red)])
+plt.title('Histograms of Position and Orientation Distances')
+plt.xlabel('Distance Values')
 plt.ylabel('Frequency')
 plt.axvline(x=od_mean, color='black', linestyle='--', label='Orientation Distance Mean')
-plt.axvline(x=pd_mean, color='black', linestyle='solid', label='Position Distance Mean')
+plt.axvline(x=pd_mean, color='orange', linestyle='dotted', label='Position Distance Mean')
+
+plt.subplot(1,2,2)
+#plt.figure(figsize=(10, 8))
+plt.hist([pd_values, od_values_s], bins=50, label=['Position Distance', 'Orientation Distance'], color=[get_color(color_blue), get_color(color_red)])
+plt.title('Histograms of Position and Orientation (Scaled) Distances')
+plt.xlabel('Distance Values')
+plt.ylabel('Frequency')
+plt.axvline(x=od_mean_s, color='black', linestyle='--', label='Orientation Distance Mean')
+plt.axvline(x=pd_mean, color='orange', linestyle='dotted', label='Position Distance Mean')
 
 # Adjust layout and display the plots
 plt.legend()
+plt.tight_layout()
 plt.show()
 
 print(f"Position Distances Mean: {pd_mean}")
 print(f"Orientation Distances Mean: {od_mean}")
+print(f"nums: {len(od_values)}")
