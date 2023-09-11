@@ -34,7 +34,9 @@ ros_controller.request_graspnet_result(
     path="/home/juanhernandezvega/dev/RoboRL-Navigator/assets/image_captures/data.npy",
     remote_ip=remote_ip,
 )
-
+ros_controller.hand_open()
+ros_controller.hand_grasp()
+exit()
 ros_controller.add_collision_object()
 # Parse Responded File
 # processed_pose = ros_controller.process_grasping_results()

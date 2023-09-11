@@ -57,12 +57,18 @@ class ROSController:
     # GRIPPER OPERATIONS
 
     def hand_open(self) -> None:
+        # values -> {'panda_finger_joint1': 0.035, 'panda_finger_joint2': 0.035}
         self.hand_group.set_joint_value_target(self.hand_group.get_named_target_values("open"))
         self.hand_group.go(wait=True)
 
     def hand_close(self) -> None:
-        # @todo check half close
+        # values -> {'panda_finger_joint1': 0.0, 'panda_finger_joint2': 0.0}
         self.hand_group.set_joint_value_target(self.hand_group.get_named_target_values("close"))
+        self.hand_group.go(wait=True)
+
+    def hand_grasp(self) -> None:
+        target_values = {'panda_finger_joint1': 0.025, 'panda_finger_joint2': 0.025}
+        self.hand_group.set_joint_value_target(target_values)
         self.hand_group.go(wait=True)
 
     # POSE OPERATIONS
