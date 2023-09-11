@@ -32,7 +32,7 @@ class ROSController:
         current_directory = os.path.dirname(__file__)
         self.save_dir = os.path.abspath(os.path.join(current_directory, '..', '..', 'assets', 'image_captures'))
         self.ee_link = self.move_group.get_end_effector_link()
-        self.box_name = "yum_yum_link_0"
+        self.box_name = "YumYum_D3_Liquid"
 
         self.status_queue = deque(maxlen=5)
         self.rgb_array = None
@@ -44,6 +44,7 @@ class ROSController:
         self.graspnet_url = "http://localhost:5000/run?path={path}"
 
         self.capture_joint_degrees = [0, -1.571, 0, -2.688, 0, 1.728, 0.7854]
+        self.neutral_joint_values = [0.0, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77]
         self.set_model_state_proxy = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
         self.move_group.set_planning_time(1.9)
 
@@ -107,6 +108,9 @@ class ROSController:
         self.move_group.go(wait=True)
         self.move_group.stop()
         self.move_group.clear_pose_targets()
+
+    def go_to_home_position(self):
+        self.move_group.go(self.neutral_joint_values, True)
 
     # CAMERA OPERATIONS
 
@@ -174,7 +178,7 @@ class ROSController:
         self.latest_grasp_result_path = response.text
         return response.text
 
-    def transform_grasp_results(self, path=None) -> np.ndarray:
+    def process_grasping_results(self, path=None) -> np.ndarray:
         if path is None:
             if self.latest_grasp_result_path is None:
                 return None
@@ -249,3 +253,14 @@ class ROSController:
 
     def set_target_pose(self, position: np.ndarray, orientation: np.ndarray) -> None:
         return self.set_base_pose(self.box_name, position, orientation)
+
+    def pose_to_array(self, pose: Pose) -> np.ndarray:
+        return np.array([
+            pose.pose.position.x,
+            pose.pose.position.y,
+            pose.pose.position.z,
+            pose.pose.orientation.x,
+            pose.pose.orientation.y,
+            pose.pose.orientation.z,
+            pose.pose.orientation.w,
+        ]).astype(np.float32)

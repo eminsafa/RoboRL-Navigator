@@ -14,7 +14,7 @@ ros_controller.view_image()
 # Send Request to Contact Graspnet Server
 ros_controller.request_graspnet_result()
 # Parse Responded File
-raw_pose = ros_controller.transform_grasp_results()
+raw_pose = ros_controller.process_grasping_results()
 # Transform Frame to Panda Base
 pose = ros_controller.transform_camera_to_world(raw_pose)
 ros_controller.get_pose_goal_plan_with_duration(pose, 'rrt')

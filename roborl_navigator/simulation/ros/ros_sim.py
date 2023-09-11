@@ -19,6 +19,7 @@ class ROSSim(Simulation):
     def __init__(
             self,
             orientation_task: bool = False,
+            experiment: bool = False,
     ) -> None:
         super().__init__()
         moveit_commander.roscpp_initialize(sys.argv)
@@ -27,6 +28,7 @@ class ROSSim(Simulation):
         self.robot = moveit_commander.RobotCommander()
 
         self.orientation_task = orientation_task
+        self.experiment = experiment
 
         # Object Manager
         self.model_paths = {
@@ -49,9 +51,10 @@ class ROSSim(Simulation):
 
     def create_scene(self) -> None:
         # create a ground as collision object in Rviz
-        self.create_object("target", np.zeros(3), np.zeros(3))
-        if self.orientation_task:
-            self.create_object("target_orientation_mark", np.zeros(3), np.zeros(3))
+        if not self.experiment:
+            self.create_object("target", np.zeros(3), np.zeros(3))
+            if self.orientation_task:
+                self.create_object("target_orientation_mark", np.zeros(3), np.zeros(3))
 
     def create_sphere(self, position: np.ndarray) -> None:
         pass

@@ -17,6 +17,7 @@ class Reach:
         goal_range=0.3,
         orientation_task=False,
         custom_reward=False,
+        experiment=False,
     ) -> None:
         self.sim = sim
         self.robot = robot
@@ -26,6 +27,7 @@ class Reach:
         self.orientation_task = orientation_task
         self.custom_reward = custom_reward
         self.distance_threshold = distance_threshold
+        self.experiment = experiment
 
         # min X can be 0.07
         self.goal_range_low = np.array([0.5 - (goal_range / 2), -goal_range / 2, 0.05])
@@ -41,10 +43,14 @@ class Reach:
 
     def reset(self) -> None:
         self.goal = self._sample_goal()
-        self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
-        if self.orientation_task:
-            goal_orientation = euler_to_quaternion([self.goal[3], self.goal[4], 0])
-            self.sim.set_base_pose("target_orientation_mark", self.goal[:3], goal_orientation)
+        if not self.experiment:
+            self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
+            if self.orientation_task:
+                goal_orientation = euler_to_quaternion([self.goal[3], self.goal[4], 0])
+                self.sim.set_base_pose("target_orientation_mark", self.goal[:3], goal_orientation)
+
+    def set_goal(self, goal: np.ndarray):
+        self.goal = goal
 
     def get_obs(self) -> np.ndarray:
         return np.array([])  # no tasak-specific observation

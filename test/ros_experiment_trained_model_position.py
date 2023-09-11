@@ -18,6 +18,7 @@ model = TD3.load(
 )
 
 observation = model.env.reset()
+print(observation)
 
 # Evaluate the agent
 for episode in range(1_000):

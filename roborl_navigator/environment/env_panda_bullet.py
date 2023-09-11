@@ -15,7 +15,7 @@ from roborl_navigator.utils import euler_to_quaternion
 class FrankaBulletEnv(BaseEnv):
     metadata = {"render_modes": ["human", "rgb_array"]}
 
-    def __init__(self, render_mode="human", orientation_task=False, distance_threshold=0.05, custom_reward=False) -> None:
+    def __init__(self, render_mode="human", orientation_task=False, distance_threshold=0.05, custom_reward=False, goal_range=0.3) -> None:
         self.sim = BulletSim(render_mode=render_mode, renderer="Tiny", n_substeps=30, orientation_task=orientation_task)
         self.robot = BulletPanda(self.sim, orientation_task=orientation_task)
         self.task = Reach(
