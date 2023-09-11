@@ -16,10 +16,10 @@ except ImportError:
 
 class ROSRobot(Robot):
 
-    def __init__(self, sim: ROSSim, orientation_task: bool = False) -> None:
+    def __init__(self, sim: ROSSim, orientation_task: bool = False, real_panda=False) -> None:
         super().__init__(sim, orientation_task)
-
-        self.move_group = moveit_commander.MoveGroupCommander("panda_manipulator")
+        robot_name = "panda" if not real_panda else "fr3"
+        self.move_group = moveit_commander.MoveGroupCommander(robot_name + "_manipulator")
         self.status_queue = deque(maxlen=5)
 
     def get_ee_position(self) -> np.ndarray:
