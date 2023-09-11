@@ -27,6 +27,7 @@ model = TD3.load(
 sim = ROSSim(orientation_task=False)
 robot = ROSRobot(sim=sim, orientation_task=False)
 ros_controller = ROSController()
+remote_ip = "http://localhost:5000/run"
 
 # Open the gripper
 ros_controller.hand_open()
@@ -38,9 +39,13 @@ ros_controller.capture_image_and_save_info()
 ros_controller.view_image()
 
 # Send Request to Contact Graspnet Server
-ros_controller.request_graspnet_result()
+ros_controller.request_graspnet_result(remote_ip=remote_ip)
 # Parse Responded File
 processed_pose = ros_controller.process_grasping_results()
+
+if not processed_pose:
+    exit()
+
 # Transform Frame to Panda Base
 target_pose = ros_controller.transform_camera_to_world(processed_pose)
 # Convert Pose to Array

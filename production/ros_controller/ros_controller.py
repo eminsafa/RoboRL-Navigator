@@ -2,6 +2,7 @@ import math
 import os
 import time
 from collections import deque
+from tempfile import NamedTemporaryFile
 from typing import Optional, Tuple
 
 import moveit_commander
@@ -15,15 +16,19 @@ from gazebo_msgs.srv import SetModelState
 from geometry_msgs.msg import PoseStamped, Pose
 from scipy.spatial.transform import Rotation
 from sensor_msgs.msg import CameraInfo, Image
+from moveit_msgs.msg import CollisionObject, AttachedCollisionObject
+from shape_msgs.msg import SolidPrimitive
 from tf import TransformListener
 from tf.transformations import quaternion_from_euler
 
 
 class ROSController:
-    def __init__(self):
+    def __init__(self, real_robot: bool = False):
+        self.real_robot = real_robot
+        robot = "fr3" if real_robot else "panda"
         rospy.init_node("panda_controller", anonymous=True)
-        self.move_group = moveit_commander.MoveGroupCommander("panda_manipulator")
-        self.hand_group = moveit_commander.MoveGroupCommander("panda_hand")
+        self.move_group = moveit_commander.MoveGroupCommander(robot + "_manipulator")  # or fr3
+        self.hand_group = moveit_commander.MoveGroupCommander(robot + "_hand")
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
         self.tf_listener = TransformListener()
@@ -43,10 +48,11 @@ class ROSController:
         self.latest_grasp_result_path = None
         self.graspnet_url = "http://localhost:5000/run?path={path}"
 
-        self.capture_joint_degrees = [0, -1.571, 0, -2.688, 0, 1.728, 0.7854]
+        self.capture_joint_degrees = [0, -1.5, 0, -2.5, 0, 1.728, 0.7854]
         self.neutral_joint_values = [0.0, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77]
         self.set_model_state_proxy = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
         self.move_group.set_planning_time(1.9)
+        time.sleep(1)  # wait to fill buffer
 
     # GRIPPER OPERATIONS
 
@@ -55,6 +61,7 @@ class ROSController:
         self.hand_group.go(wait=True)
 
     def hand_close(self) -> None:
+        # @todo check half close
         self.hand_group.set_joint_value_target(self.hand_group.get_named_target_values("close"))
         self.hand_group.go(wait=True)
 
@@ -112,6 +119,9 @@ class ROSController:
     def go_to_home_position(self):
         self.move_group.go(self.neutral_joint_values, True)
 
+    def get_joint_values(self):
+        return self.move_group.get_current_jonit_values()
+
     # CAMERA OPERATIONS
 
     def rgb_callback(self, msg):
@@ -119,7 +129,8 @@ class ROSController:
         time.sleep(1)
 
     def depth_callback(self, msg):
-        depth_img = self.cv_bridge.imgmsg_to_cv2(msg, "32FC1")
+        encoding = "rgb8" if self.real_robot else "32FC1"
+        depth_img = self.cv_bridge.imgmsg_to_cv2(msg, encoding)
         self.depth_array = np.array(depth_img, dtype=np.dtype("f8"))
         time.sleep(1)
 
@@ -160,23 +171,35 @@ class ROSController:
 
     # CONTACT GRASPNET INTEGRATION
 
-    def request_graspnet_result(self, path=None) -> Optional[str]:
+    def request_graspnet_result(self, path=None, remote_ip: Optional[str] = None) -> Optional[str]:
         if path is None:
             if self.latest_capture_path is None:
                 return None
             path = self.latest_capture_path
         print(f"REQUESTED PATH: {path}")
         try:
-            response = requests.get(self.graspnet_url.format(path=path), timeout=30)
+            if remote_ip:
+                files = {'file': ('data.npy', open(path, 'rb'))}
+                response = requests.get(remote_ip, files=files, timeout=30)
+            else:
+                response = requests.get(self.graspnet_url.format(path=path), timeout=30)
         except Exception as e:
             print(f"Request failed, please make sure Contact Graspnet Server is running!\n{e}")
             return None
         if response.status_code != 200:
             print("Grasping Pose Detection process failed!")
             return None
-        print(f"Response Text: {response.text}")
-        self.latest_grasp_result_path = response.text
-        return response.text
+
+        if remote_ip:
+            saved_file_path = "/home/juanhernandezvega/dev/RoboRL-Navigator/assets/grasping_pose_results/predictions.npz"
+            with open(saved_file_path, 'wb') as target_file:
+                target_file.write(response.content)
+            print(f"Results Saved: {saved_file_path}")
+            return saved_file_path
+        else:
+            print(f"Response Text: {response.text}")
+            self.latest_grasp_result_path = response.text
+            return response.text
 
     def process_grasping_results(self, path=None) -> np.ndarray:
         if path is None:
@@ -264,3 +287,12 @@ class ROSController:
             pose.pose.orientation.z,
             pose.pose.orientation.w,
         ]).astype(np.float32)
+
+    def add_collision_object(self):
+        p = PoseStamped()
+        p.header.frame_id = "panda_link0"
+        p.pose.position.x = 0.
+        p.pose.position.y = 0.
+        p.pose.position.z = -0.05
+        self.scene.add_box("table", p, (2.0, 2.0, 0.1))
+        return True
