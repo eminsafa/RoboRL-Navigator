@@ -18,7 +18,9 @@ class ROSRobot(Robot):
 
     def __init__(self, sim: ROSSim, orientation_task: bool = False, real_panda=False) -> None:
         super().__init__(sim, orientation_task)
-        robot_name = "panda" if not real_panda else "fr3"
+        self.real_panda = real_panda
+        robot_name = "fr3"
+        print(robot_name)
         self.move_group = moveit_commander.MoveGroupCommander(robot_name + "_manipulator")
         self.status_queue = deque(maxlen=5)
 
@@ -85,18 +87,15 @@ class ROSRobot(Robot):
         self.set_joint_angles(self.neutral_joint_values)
 
     def control_joints(self, joint_values: np.ndarray) -> PlannerResult:
-        try:
-            success, plan, _, _ = self.move_group.plan(joint_values)
-        except moveit_commander.MoveItCommanderException:
-            return PlannerResult.MOVEIT_ERROR
-        if not success:
-            return PlannerResult.COLLISION
-        try:
+        if self.real_panda:
+            joint_values = joint_values.tolist()
             self.move_group.go(joint_values, True)
-        except moveit_commander.MoveItCommanderException:
-            return PlannerResult.MOVEIT_ERROR
-        self.move_group.stop()
-        return PlannerResult.SUCCESS
+            try:
+                self.move_group.go(joint_values, True)
+            except moveit_commander.MoveItCommanderException:
+                return PlannerResult.MOVEIT_ERROR
+            self.move_group.stop()
+            return PlannerResult.SUCCESS
 
     # ROS Specific
     def stuck_check(self):

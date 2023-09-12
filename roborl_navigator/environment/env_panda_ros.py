@@ -17,9 +17,9 @@ from roborl_navigator.task.reach_task import Reach
 
 class FrankaROSEnv(BaseEnv):
 
-    def __init__(self, orientation_task=False, distance_threshold=0.05, custom_reward=False, experiment=False) -> None:
+    def __init__(self, orientation_task=False, distance_threshold=0.05, custom_reward=False, experiment=False, real_panda=False) -> None:
         self.sim = ROSSim(orientation_task=orientation_task, experiment=experiment)
-        self.robot = ROSRobot(self.sim, orientation_task=orientation_task)
+        self.robot = ROSRobot(self.sim, orientation_task=orientation_task, real_panda=real_panda)
         self.task = Reach(
             self.sim,
             self.robot,

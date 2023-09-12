@@ -50,6 +50,8 @@ class ROSController:
 
         self.capture_joint_degrees = [0, -1.5, 0, -2.5, 0, 1.728, 0.7854]
         self.neutral_joint_values = [0.0, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77]
+        self.up_joints = [0.0, 0.0, 0.0, -1.78, 0.0, 2.24, 0.77]
+        self.relase_joint_values = [1.39, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77]
         self.set_model_state_proxy = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
         self.move_group.set_planning_time(1.9)
         time.sleep(1)  # wait to fill buffer
@@ -67,7 +69,7 @@ class ROSController:
         self.hand_group.go(wait=True)
 
     def hand_grasp(self) -> None:
-        target_values = {'panda_finger_joint1': 0.025, 'panda_finger_joint2': 0.025}
+        target_values = {'fr3_finger_joint1': 0.006, 'fr3_finger_joint2': 0.006}
         self.hand_group.set_joint_value_target(target_values)
         self.hand_group.go(wait=True)
 
@@ -89,6 +91,17 @@ class ROSController:
         position = np.random.uniform(0.1, 0.3, size=(3,))
         orientation = Rotation.random().as_quat()
         return self.create_pose(position, orientation)
+    
+
+    def get_ee_position(self) -> np.ndarray:
+        position = self.move_group.get_current_pose().pose.position
+        return np.array(
+            [
+                position.x,
+                position.y,
+                position.z,
+            ]
+        ).astype(np.float32)
 
     # PLANNING OPERATIONS
 
@@ -125,6 +138,10 @@ class ROSController:
     def go_to_home_position(self):
         self.move_group.go(self.neutral_joint_values, True)
 
+    def go_to_release_position(self):
+        self.move_group.go(self.up_joints, True)
+        self.move_group.go(self.relase_joint_values, True)
+
     def get_joint_values(self):
         return self.move_group.get_current_jonit_values()
 
@@ -135,8 +152,7 @@ class ROSController:
         time.sleep(1)
 
     def depth_callback(self, msg):
-        encoding = "rgb8" if self.real_robot else "32FC1"
-        depth_img = self.cv_bridge.imgmsg_to_cv2(msg, encoding)
+        depth_img = self.cv_bridge.imgmsg_to_cv2(msg, "32FC1")
         self.depth_array = np.array(depth_img, dtype=np.dtype("f8"))
         time.sleep(1)
 
@@ -197,11 +213,11 @@ class ROSController:
             return None
 
         if remote_ip:
-            saved_file_path = "/home/juanhernandezvega/dev/RoboRL-Navigator/assets/grasping_pose_results/predictions.npz"
-            with open(saved_file_path, 'wb') as target_file:
+            temp_file_path = self.save_dir + "/predictions.npz"
+            with open(temp_file_path, 'wb') as target_file:
                 target_file.write(response.content)
-            print(f"Results Saved: {saved_file_path}")
-            return saved_file_path
+            print(f"Results Saved: {temp_file_path}")
+            return temp_file_path
         else:
             print(f"Response Text: {response.text}")
             self.latest_grasp_result_path = response.text
@@ -296,9 +312,9 @@ class ROSController:
 
     def add_collision_object(self):
         p = PoseStamped()
-        p.header.frame_id = "panda_link0"
+        p.header.frame_id = "fr3_link0"
         p.pose.position.x = 0.
         p.pose.position.y = 0.
-        p.pose.position.z = -0.05
+        p.pose.position.z = -0.01
         self.scene.add_box("table", p, (2.0, 2.0, 0.1))
         return True
