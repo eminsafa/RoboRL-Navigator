@@ -9,7 +9,7 @@ import roborl_navigator.environment
 
 
 env = gym.make(
-    "RoboRL-Navigator-Franka-ROS",
+    "RoboRL-Navigator-Panda-ROS",
     orientation_task=True,
     distance_threshold=0.08,
 )

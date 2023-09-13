@@ -10,7 +10,7 @@ from train.trainer import Trainer
 import roborl_navigator.environment
 
 env = gym.make(
-    "RoboRL-Navigator-Franka-Bullet",
+    "RoboRL-Navigator-Panda-Bullet",
     render_mode="human",
     orientation_task=False,
     distance_threshold=0.05,
