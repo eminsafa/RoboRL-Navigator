@@ -1,12 +1,15 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Tuple,
+)
 
 import numpy as np
 import gymnasium as gym
-from gymnasium import spaces
 
 
 class BaseEnv(gym.Env):
-    metadata = {"render_modes": ["human", "rgb_array"]}
     robot = None
     sim = None
     task = None
@@ -19,11 +22,11 @@ class BaseEnv(gym.Env):
         achieved_goal_shape = observation["achieved_goal"].shape
         desired_goal_shape = observation["achieved_goal"].shape
 
-        self.observation_space = spaces.Dict(
+        self.observation_space = gym.spaces.Dict(
             dict(
-                observation=spaces.Box(-10.0, 10.0, shape=observation_shape, dtype=np.float32),
-                desired_goal=spaces.Box(-10.0, 10.0, shape=achieved_goal_shape, dtype=np.float32),
-                achieved_goal=spaces.Box(-10.0, 10.0, shape=desired_goal_shape, dtype=np.float32),
+                observation=gym.spaces.Box(-10.0, 10.0, shape=observation_shape, dtype=np.float32),
+                desired_goal=gym.spaces.Box(-10.0, 10.0, shape=achieved_goal_shape, dtype=np.float32),
+                achieved_goal=gym.spaces.Box(-10.0, 10.0, shape=desired_goal_shape, dtype=np.float32),
             )
         )
 
@@ -54,22 +57,3 @@ class BaseEnv(gym.Env):
 
     def render(self) -> Optional[np.ndarray]:
         return NotImplemented
-
-    # STATE METHODS
-
-    def save_state(self) -> int:
-        """Save the current state of the environment. Restore with `restore_state`."""
-        state_id = self.sim.save_state()
-        self._saved_goal[state_id] = self.task.goal
-        return state_id
-
-    def restore_state(self, state_id: int) -> None:
-        """Restore the state associated with the unique identifier."""
-        self.sim.restore_state(state_id)
-        self.task.goal = self._saved_goal[state_id]
-
-    def remove_state(self, state_id: int) -> None:
-        """Remove a saved state."""
-        self._saved_goal.pop(state_id)
-        self.sim.remove_state(state_id)
-

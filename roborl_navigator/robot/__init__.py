@@ -1,1 +1,1 @@
-# from .pybullet_panda_robot import PyBulletPanda
+from .base_robot import Robot

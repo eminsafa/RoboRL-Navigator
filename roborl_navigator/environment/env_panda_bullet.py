@@ -1,6 +1,9 @@
-import math
-import time
-from typing import Any, Dict, Optional, Tuple
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Tuple,
+)
 
 import numpy as np
 from gymnasium.utils import seeding
@@ -9,14 +12,19 @@ from roborl_navigator.environment import BaseEnv
 from roborl_navigator.simulation.bullet import BulletSim
 from roborl_navigator.robot.bullet_panda_robot import BulletPanda
 from roborl_navigator.task.reach_task import Reach
-from roborl_navigator.utils import euler_to_quaternion
 
 
 class FrankaBulletEnv(BaseEnv):
     metadata = {"render_modes": ["human", "rgb_array"]}
 
-    def __init__(self, render_mode="human", orientation_task=False, distance_threshold=0.05, custom_reward=False, goal_range=0.3) -> None:
-        self.sim = BulletSim(render_mode=render_mode, renderer="Tiny", n_substeps=30, orientation_task=orientation_task)
+    def __init__(
+            self,
+            render_mode: str = "human",
+            orientation_task: bool = False,
+            distance_threshold: float = 0.05,
+            goal_range: float = 0.3,
+    ) -> None:
+        self.sim = BulletSim(render_mode=render_mode, n_substeps=30, orientation_task=orientation_task)
         self.robot = BulletPanda(self.sim, orientation_task=orientation_task)
         self.task = Reach(
             self.sim,
@@ -24,7 +32,7 @@ class FrankaBulletEnv(BaseEnv):
             reward_type="dense",
             orientation_task=orientation_task,
             distance_threshold=distance_threshold,
-            custom_reward=custom_reward,
+            goal_range=goal_range
         )
         super().__init__()
 
@@ -67,7 +75,7 @@ class FrankaBulletEnv(BaseEnv):
                 self.sim.step()
 
         observation = self._get_obs()
-        # An episode is terminated iff the agent has reached the target
+        # An episode is terminated if the agent has reached the target
         terminated = bool(self.task.is_success(observation["achieved_goal"], self.task.get_goal()))
         truncated = False
         info = {"is_success": terminated}

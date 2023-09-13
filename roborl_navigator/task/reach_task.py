@@ -1,23 +1,30 @@
 from typing import (
-    Dict,
     Any,
+    Dict,
+    Optional,
+    TypeVar,
 )
 
 import numpy as np
 from roborl_navigator.utils import distance, euler_to_quaternion
+from roborl_navigator.simulation import Simulation
+from roborl_navigator.robot import Robot
+
+Sim = TypeVar('Sim', bound=Simulation)
+Rob = TypeVar('Rob', bound=Robot)
 
 
 class Reach:
+
     def __init__(
         self,
-        sim,
-        robot,
-        reward_type="sparse",
-        distance_threshold=0.1,
-        goal_range=0.3,
-        orientation_task=False,
-        custom_reward=False,
-        experiment=False,
+        sim: Sim,
+        robot: Rob,
+        reward_type: Optional[str] = "dense",
+        distance_threshold: Optional[float] = 0.1,
+        goal_range: Optional[float] = 0.3,
+        orientation_task: Optional[bool] = False,
+        demonstration: Optional[bool] = False,
     ) -> None:
         self.sim = sim
         self.robot = robot
@@ -25,9 +32,8 @@ class Reach:
 
         self.reward_type = reward_type
         self.orientation_task = orientation_task
-        self.custom_reward = custom_reward
         self.distance_threshold = distance_threshold
-        self.experiment = experiment
+        self.demonstration = demonstration
 
         # min X can be 0.07
         self.goal_range_low = np.array([0.5 - (goal_range / 2), -goal_range / 2, 0.05])
@@ -43,7 +49,7 @@ class Reach:
 
     def reset(self) -> None:
         self.goal = self._sample_goal()
-        if not self.experiment:
+        if not self.demonstration:
             self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
             if self.orientation_task:
                 goal_orientation = euler_to_quaternion([self.goal[3], self.goal[4], 0])
@@ -52,8 +58,9 @@ class Reach:
     def set_goal(self, goal: np.ndarray):
         self.goal = goal
 
-    def get_obs(self) -> np.ndarray:
-        return np.array([])  # no tasak-specific observation
+    @staticmethod
+    def get_obs() -> np.ndarray:
+        return np.array([])  # no task-specific observation
 
     def get_achieved_goal(self) -> np.ndarray:
         ee_position = np.array(self.robot.get_ee_position())

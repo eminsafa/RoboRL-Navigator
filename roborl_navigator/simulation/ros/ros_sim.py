@@ -1,12 +1,18 @@
+import numpy as np
 import os
+import rospy
 import sys
-from typing import Optional
+from typing import (
+    Any,
+    Optional,
+)
 
 import moveit_commander
-import numpy as np
-import rospy
 from gazebo_msgs.msg import ModelState
-from gazebo_msgs.srv import SpawnModel, SetModelState
+from gazebo_msgs.srv import (
+    SetModelState,
+    SpawnModel,
+)
 from geometry_msgs.msg import Pose
 
 from roborl_navigator.simulation import Simulation
@@ -14,21 +20,17 @@ from roborl_navigator.utils import euler_to_quaternion
 
 
 class ROSSim(Simulation):
-    """Convenient class to use PyBullet physics engine."""
+    """ROSSim basically represents Gazebo Simulation"""
 
-    def __init__(
-            self,
-            orientation_task: bool = False,
-            experiment: bool = False,
-    ) -> None:
+    def __init__(self, orientation_task: bool = False, demonstration: bool = False) -> None:
         super().__init__()
+        self.orientation_task = orientation_task
+        self.demonstration = demonstration
+
         moveit_commander.roscpp_initialize(sys.argv)
         rospy.init_node('panda_controller', anonymous=True)
         self.scene = moveit_commander.PlanningSceneInterface()
         self.robot = moveit_commander.RobotCommander()
-
-        self.orientation_task = orientation_task
-        self.experiment = experiment
 
         # Object Manager
         self.model_paths = {
@@ -46,12 +48,12 @@ class ROSSim(Simulation):
     def close(self) -> None:
         return None
 
-    def render(self, *args, **kwargs) -> Optional[np.ndarray]:
+    def render(self, *args: Any, **kwargs: Any) -> Optional[np.ndarray]:
         return None
 
     def create_scene(self) -> None:
-        # create a ground as collision object in Rviz
-        if not self.experiment:
+        # Create a ground collision object in the RVIZ
+        if not self.demonstration:
             self.create_object("target", np.zeros(3), np.zeros(3))
             if self.orientation_task:
                 self.create_object("target_orientation_mark", np.zeros(3), np.zeros(3))
@@ -101,7 +103,7 @@ class ROSSim(Simulation):
         spawn_model = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
         spawn_model(body, str(model), "", model_state, "world")
 
-    def retrieve_model(self, model_name: str):
+    def retrieve_model(self, model_name: str) -> Optional[bool]:
         if model_name not in self.model_paths:
             print(f"Model name ({model_name}) not in self.model_paths")
             return False

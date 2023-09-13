@@ -11,19 +11,18 @@ from roborl_navigator.simulation import Simulation
 
 
 class BulletSim(Simulation):
+
     def __init__(
             self,
-            render_mode: str = "rgb_array",
-            n_substeps: int = 20,
-            background_color: Optional[np.ndarray] = None,
-            renderer: str = "Tiny",
-            orientation_task: bool = False,
+            render_mode: Optional[str] = "rgb_array",
+            n_substeps: Optional[int] = 20,
+            renderer: Optional[str] = "Tiny",
+            orientation_task: Optional[bool] = False,
     ) -> None:
         super().__init__(render_mode, n_substeps)
 
         self.orientation_task = orientation_task
-        background_color = background_color if background_color is not None else np.array([61.0, 61.0, 61.0])
-        self.background_color = background_color.astype(np.float32) / 255
+        self.background_color = np.array([61.0, 61.0, 61.0]).astype(np.float32) / 255
         options = "--background_color_red={} --background_color_green={} --background_color_blue={}".format(
             *self.background_color
         )
@@ -90,7 +89,6 @@ class BulletSim(Simulation):
                 shadow=True,
                 renderer=p.ER_BULLET_HARDWARE_OPENGL,
             )
-            # With Python3.10, pybullet return flat tuple instead of array. So we need to build create the array.
             rgba = np.array(rgba, dtype=np.uint8).reshape((height, width, 4))
             return rgba[..., :3]
 
@@ -159,7 +157,7 @@ class BulletSim(Simulation):
         self._bodies_idx[body_name] = self.physics_client.loadURDF(**kwargs)
 
     # OBJECT MANAGER
-    def create_scene(self):
+    def create_scene(self) -> None:
         self.create_plane(z_offset=-0.4)
         self.create_table(length=1.3, width=2, height=0.1)
         self.create_sphere(np.zeros(3))
@@ -252,7 +250,7 @@ class BulletSim(Simulation):
             visual_kwargs=visual_kwargs,
         )
 
-    def create_orientation_mark(self, position):
+    def create_orientation_mark(self, position: np.ndarray) -> None:
         radius = 0.008
         visual_kwargs = {
             "radius": radius,
@@ -272,6 +270,5 @@ class BulletSim(Simulation):
         # oid = self._bodies_idx["panda"]
         # line_length = 30  # Length of the lines
         # p.addUserDebugLine([0, 0, 0], [line_length, 0, 0], [1, 0, 0], parentObjectUniqueId=oid, parentLinkIndex=10)
-        # p.addUserDebugLine([0, 0, 0], [0, line_length, 0], [0, 1, 0], parentObjectUniqueId=oid, parentLinkIndex=10)  # right
-        # p.addUserDebugLine([0, 0, 0], [0, 0, line_length], [0, 0, 1], parentObjectUniqueId=oid, parentLinkIndex=10)  # z
-
+        # p.addUserDebugLine([0, 0, 0], [0, line_length, 0], [0, 1, 0], parentObjectUniqueId=oid, parentLinkIndex=10)
+        # p.addUserDebugLine([0, 0, 0], [0, 0, line_length], [0, 0, 1], parentObjectUniqueId=oid, parentLinkIndex=10)
