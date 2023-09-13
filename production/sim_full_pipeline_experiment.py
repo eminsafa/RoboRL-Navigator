@@ -5,7 +5,10 @@ import numpy as np
 from production.ros_controller import ROSController
 import time
 
-from stable_baselines3 import TD3, HerReplayBuffer
+from stable_baselines3 import (
+    HerReplayBuffer,
+    TD3,
+)
 import gymnasium as gym
 from roborl_navigator.robot.ros_panda_robot import ROSRobot
 from roborl_navigator.simulation.ros import ROSSim
@@ -15,9 +18,8 @@ from roborl_navigator.environment.env_panda_ros import FrankaROSEnv
 
 env = FrankaROSEnv(
     orientation_task=False,
-    custom_reward=False,
     distance_threshold=0.025,
-    experiment=True,
+    demonstration=True,
 )
 model = TD3.load(
     '/home/juanhernandezvega/dev/RoboRL-Navigator/models/roborl-navigator/TD3_Bullet_0.05_Threshold_200K/model.zip',

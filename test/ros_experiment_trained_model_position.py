@@ -1,6 +1,9 @@
 import time
 
-from stable_baselines3 import TD3, HerReplayBuffer
+from stable_baselines3 import (
+    HerReplayBuffer,
+    TD3,
+)
 import gymnasium as gym
 import roborl_navigator.environment
 
@@ -8,7 +11,6 @@ import roborl_navigator.environment
 env = gym.make(
     "RoboRL-Navigator-Franka-ROS",
     orientation_task=False,
-    custom_reward=False,
     distance_threshold=0.05)
 
 model = TD3.load(
@@ -18,24 +20,21 @@ model = TD3.load(
 )
 
 observation = model.env.reset()
-print(observation)
-
 # Evaluate the agent
 for episode in range(1_000):
     episode_total = 0.0
     for _ in range(50):
-
         start_time = time.time()
         action = model.predict(observation)
         end_time = time.time()
-        planning_time = round((end_time - start_time)*1000)
+        planning_time = round((end_time - start_time) * 1000)
         episode_total += planning_time
         action = action[0]
         observation, reward, terminated, info = model.env.step(action)
         model.env.render()
         success = info[0].get('is_success', False)
         if terminated or success:
-            print(f"EPISODE TOTAL: {episode_total}")
+            print(f"Total Training Time of Episode {_}: {episode_total} ms")
             time.sleep(3)
             break
     observation = model.env.reset()

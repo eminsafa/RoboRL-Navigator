@@ -1,13 +1,18 @@
-from train.trainer import Trainer
 import gymnasium as gym
+
+from stable_baselines3 import (
+    DDPG,
+    HerReplayBuffer,
+    SAC,
+    TD3,
+)
+from train.trainer import Trainer
 import roborl_navigator.environment
-from stable_baselines3 import DDPG, HerReplayBuffer, TD3, SAC
 
 env = gym.make(
     "RoboRL-Navigator-Franka-Bullet",
     render_mode="human",
     orientation_task=False,
-    custom_reward=False,
     distance_threshold=0.05,
     goal_range=0.2
 )

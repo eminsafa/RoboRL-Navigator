@@ -1,6 +1,9 @@
 import numpy as np
 import time
-from stable_baselines3 import HerReplayBuffer, TD3
+from stable_baselines3 import (
+    HerReplayBuffer,
+    TD3,
+)
 
 from roborl_navigator.environment.env_panda_ros import FrankaROSEnv
 from roborl_navigator.robot.ros_panda_robot import ROSRobot
@@ -10,10 +13,9 @@ from ros_controller import ROSController
 
 env = FrankaROSEnv(
     orientation_task=False,
-    custom_reward=False,
     distance_threshold=0.025,
-    experiment=True,
-    real_panda=True,
+    demonstration=True,
+    real_robot=True,
 )
 model = TD3.load(
     '/home/franka/dev/RoboRL-Navigator/models/roborl-navigator/TD3_Bullet_0.05_Threshold_200K/model.zip',
@@ -21,7 +23,7 @@ model = TD3.load(
     replay_buffer_class=HerReplayBuffer,
 )
 sim = ROSSim(orientation_task=False)
-robot = ROSRobot(sim=sim, orientation_task=False, real_panda=False)
+robot = ROSRobot(sim=sim, orientation_task=False, real_robot=False)
 ros_controller = ROSController(real_robot=True)
 remote_ip = "http://172.20.10.10:6161/run"
 

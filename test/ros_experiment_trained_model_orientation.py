@@ -1,6 +1,9 @@
 import time
 
-from stable_baselines3 import TD3, HerReplayBuffer
+from stable_baselines3 import (
+    HerReplayBuffer,
+    TD3,
+)
 import gymnasium as gym
 import roborl_navigator.environment
 
@@ -8,8 +11,8 @@ import roborl_navigator.environment
 env = gym.make(
     "RoboRL-Navigator-Franka-ROS",
     orientation_task=True,
-    custom_reward=True,
-    distance_threshold=0.08)
+    distance_threshold=0.08,
+)
 
 model = TD3.load(
     '/home/juanhernandezvega/dev/RoboRL-Navigator/models/roborl-navigator/TD3_orientation_200K/model.zip',
