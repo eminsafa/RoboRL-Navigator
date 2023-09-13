@@ -1,34 +1,43 @@
 import math
 import os
 import time
-from collections import deque
-from tempfile import NamedTemporaryFile
-from typing import Optional, Tuple
+from typing import (
+    Any,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
 import moveit_commander
 import numpy as np
 import requests
 import rospy
-from PIL import Image as PILImage
 from cv_bridge import CvBridge
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
-from geometry_msgs.msg import PoseStamped, Pose
+from geometry_msgs.msg import (
+    Pose,
+    PoseStamped,
+)
+from PIL import Image as PILImage
 from scipy.spatial.transform import Rotation
-from sensor_msgs.msg import CameraInfo, Image
-from moveit_msgs.msg import CollisionObject, AttachedCollisionObject
-from shape_msgs.msg import SolidPrimitive
+from sensor_msgs.msg import (
+    CameraInfo,
+    Image,
+)
 from tf import TransformListener
 from tf.transformations import quaternion_from_euler
 
 
 class ROSController:
+
     def __init__(self, real_robot: bool = False):
         self.real_robot = real_robot
-        robot = "fr3" if real_robot else "panda"
+        self.robot_name = "fr3" if real_robot else "panda"
         rospy.init_node("panda_controller", anonymous=True)
-        self.move_group = moveit_commander.MoveGroupCommander(robot + "_manipulator")  # or fr3
-        self.hand_group = moveit_commander.MoveGroupCommander(robot + "_hand")
+        self.move_group = moveit_commander.MoveGroupCommander(self.robot_name + "_manipulator")
+        self.hand_group = moveit_commander.MoveGroupCommander(self.robot_name + "_hand")
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
         self.tf_listener = TransformListener()
@@ -39,7 +48,6 @@ class ROSController:
         self.ee_link = self.move_group.get_end_effector_link()
         self.box_name = "YumYum_D3_Liquid"
 
-        self.status_queue = deque(maxlen=5)
         self.rgb_array = None
         self.depth_array = None
         self.camera_info = None
@@ -50,6 +58,8 @@ class ROSController:
 
         self.capture_joint_degrees = [0, -1.5, 0, -2.5, 0, 1.728, 0.7854]
         self.neutral_joint_values = [0.0, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77]
+        self.up_joints = [0.0, 0.0, 0.0, -1.78, 0.0, 2.24, 0.77]
+        self.relase_joint_values = [1.39, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77]
         self.set_model_state_proxy = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
         self.move_group.set_planning_time(1.9)
         time.sleep(1)  # wait to fill buffer
@@ -67,13 +77,14 @@ class ROSController:
         self.hand_group.go(wait=True)
 
     def hand_grasp(self) -> None:
-        target_values = {'panda_finger_joint1': 0.025, 'panda_finger_joint2': 0.025}
+        target_values = {f'{self.robot_name}_finger_joint1': 0.006, f'{self.robot_name}_finger_joint2': 0.006}
         self.hand_group.set_joint_value_target(target_values)
         self.hand_group.go(wait=True)
 
     # POSE OPERATIONS
 
-    def create_pose(self, position: np.ndarray, orientation: Optional[np.ndarray] = None) -> Pose:
+    @staticmethod
+    def create_pose(position: np.ndarray, orientation: Optional[np.ndarray] = None) -> Pose:
         pose = Pose()
         pose.position.x = float(position[0])
         pose.position.y = float(position[1])
@@ -89,6 +100,16 @@ class ROSController:
         position = np.random.uniform(0.1, 0.3, size=(3,))
         orientation = Rotation.random().as_quat()
         return self.create_pose(position, orientation)
+    
+    def get_ee_position(self) -> np.ndarray:
+        position = self.move_group.get_current_pose().pose.position
+        return np.array(
+            [
+                position.x,
+                position.y,
+                position.z,
+            ]
+        ).astype(np.float32)
 
     # PLANNING OPERATIONS
 
@@ -101,7 +122,7 @@ class ROSController:
         start_time = time.time()
         plan = self.move_group.plan()
         end_time = time.time()
-        planning_time = round((end_time - start_time) * 1000)
+        planning_time = round((end_time - start_time) * 1000)  # in ms
         return plan, planning_time
 
     # MOVEMENT OPERATIONS
@@ -111,36 +132,39 @@ class ROSController:
         self.move_group.stop()
         self.move_group.clear_pose_targets()
 
-    def go_to_capture_location(self):
+    def go_to_capture_location(self) -> None:
         self.move_group.go(self.capture_joint_degrees, wait=True)
         self.move_group.stop()
         self.move_group.clear_pose_targets()
 
-    def go_to_pose_goal(self, pose):
+    def go_to_pose_goal(self, pose: Pose) -> None:
         self.move_group.set_pose_target(pose)
         self.move_group.go(wait=True)
         self.move_group.stop()
         self.move_group.clear_pose_targets()
 
-    def go_to_home_position(self):
+    def go_to_home_position(self) -> None:
         self.move_group.go(self.neutral_joint_values, True)
 
-    def get_joint_values(self):
+    def go_to_release_position(self) -> None:
+        self.move_group.go(self.up_joints, True)
+        self.move_group.go(self.relase_joint_values, True)
+
+    def get_joint_values(self) -> List:
         return self.move_group.get_current_jonit_values()
 
     # CAMERA OPERATIONS
 
-    def rgb_callback(self, msg):
+    def rgb_callback(self, msg: Any) -> None:
         self.rgb_array = self.cv_bridge.imgmsg_to_cv2(msg, "bgr8")
         time.sleep(1)
 
-    def depth_callback(self, msg):
-        encoding = "rgb8" if self.real_robot else "32FC1"
-        depth_img = self.cv_bridge.imgmsg_to_cv2(msg, encoding)
+    def depth_callback(self, msg: Any) -> None:
+        depth_img = self.cv_bridge.imgmsg_to_cv2(msg, "32FC1")
         self.depth_array = np.array(depth_img, dtype=np.dtype("f8"))
         time.sleep(1)
 
-    def camera_info_callback(self, msg):
+    def camera_info_callback(self, msg: Any) -> None:
         cam_info = msg.K
         self.camera_info = np.array(
             [
@@ -151,7 +175,7 @@ class ROSController:
         )
         time.sleep(1)
 
-    def capture_image_and_save_info(self):
+    def capture_image_and_save_info(self) -> str:
         rospy.Subscriber("/camera/color/image_raw", Image, self.rgb_callback)
         rospy.Subscriber("/camera/aligned_depth_to_color/image_raw", Image, self.depth_callback)
         rospy.Subscriber("/camera/aligned_depth_to_color/camera_info", CameraInfo, self.camera_info_callback)
@@ -169,7 +193,7 @@ class ROSController:
         print("Data saved on", self.latest_capture_path)
         return self.latest_capture_path
 
-    def view_image(self):
+    def view_image(self) -> None:
         file_path = self.save_dir + '/rgb.npy'
         data = np.load(file_path)
         image = PILImage.fromarray(data)
@@ -177,7 +201,7 @@ class ROSController:
 
     # CONTACT GRASPNET INTEGRATION
 
-    def request_graspnet_result(self, path=None, remote_ip: Optional[str] = None) -> Optional[str]:
+    def request_graspnet_result(self, path: Optional[str] = None, remote_ip: Optional[str] = None) -> Optional[str]:
         if path is None:
             if self.latest_capture_path is None:
                 return None
@@ -197,35 +221,25 @@ class ROSController:
             return None
 
         if remote_ip:
-            saved_file_path = "/home/juanhernandezvega/dev/RoboRL-Navigator/assets/grasping_pose_results/predictions.npz"
-            with open(saved_file_path, 'wb') as target_file:
+            temp_file_path = self.save_dir + "/predictions.npz"
+            with open(temp_file_path, 'wb') as target_file:
                 target_file.write(response.content)
-            print(f"Results Saved: {saved_file_path}")
-            return saved_file_path
+            print(f"Results Saved: {temp_file_path}")
+            return temp_file_path
         else:
             print(f"Response Text: {response.text}")
             self.latest_grasp_result_path = response.text
             return response.text
 
-    def process_grasping_results(self, path=None) -> np.ndarray:
+    def process_grasping_results(self, path: Optional[str] = None) -> Optional[np.ndarray]:
         if path is None:
             if self.latest_grasp_result_path is None:
                 return None
             path = self.latest_grasp_result_path
 
         data = np.load(path, allow_pickle=True)
-        maxy = 0
-        argmax = 0
-        # for i in range(len(data['contact_pts'].item()[-1])):
-        #    if data['contact_pts'].item()[-1][i][2] > maxy:
-        #        argmax = i
         argmax = data['scores'].item()[-1].argmax()
-        # argmax = np.random.uniform(0, len(data['contact_pts'].item()[-1]))
-        # argmax = int(argmax)
-        print(f"ARGMAX: {argmax}")
         pred_grasp = data['pred_grasps_cam'].item()[-1][argmax]
-        contact_pts = data['contact_pts'].item()[-1][argmax]
-
         orientation = np.array((
             math.atan2(pred_grasp[2][1], pred_grasp[2][2]),
             math.asin(-pred_grasp[2][0]),
@@ -244,10 +258,7 @@ class ROSController:
 
     # FRAME TRANSFORMATION
 
-    def transform_camera_to_world(self, cv_pose):
-        from_link = "camera_depth_optical_frame"
-        to_link = "world"
-
+    def transform_camera_to_world(self, cv_pose: Union[np.ndarray, list]) -> PoseStamped:
         base_pose = PoseStamped()
         quaternion = quaternion_from_euler(
             np.double(cv_pose[3]), np.double(cv_pose[4]), np.double(cv_pose[5])
@@ -259,9 +270,9 @@ class ROSController:
         base_pose.pose.orientation.y = quaternion[1]
         base_pose.pose.orientation.z = quaternion[2]
         base_pose.pose.orientation.w = quaternion[3]
-        base_pose.header.frame_id = from_link
+        base_pose.header.frame_id = "camera_depth_optical_frame"
 
-        result = self.tf_listener.transformPose(to_link, base_pose)
+        result = self.tf_listener.transformPose("world", base_pose)
         return result
 
     # OBJECT CONTROLLER
@@ -283,7 +294,8 @@ class ROSController:
     def set_target_pose(self, position: np.ndarray, orientation: np.ndarray) -> None:
         return self.set_base_pose(self.box_name, position, orientation)
 
-    def pose_to_array(self, pose: Pose) -> np.ndarray:
+    @staticmethod
+    def pose_to_array(pose: Pose) -> np.ndarray:
         return np.array([
             pose.pose.position.x,
             pose.pose.position.y,
@@ -294,11 +306,10 @@ class ROSController:
             pose.pose.orientation.w,
         ]).astype(np.float32)
 
-    def add_collision_object(self):
+    def add_collision_object(self) -> None:
         p = PoseStamped()
-        p.header.frame_id = "panda_link0"
+        p.header.frame_id = self.robot_name + "_link0"
         p.pose.position.x = 0.
         p.pose.position.y = 0.
-        p.pose.position.z = -0.05
+        p.pose.position.z = -0.01
         self.scene.add_box("table", p, (2.0, 2.0, 0.1))
-        return True

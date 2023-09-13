@@ -10,11 +10,7 @@ import numpy as np
 
 class Simulation(ABC):
 
-    def __init__(
-        self,
-        render_mode: str = "rgb_array",
-        n_substeps: int = 20,
-    ) -> None:
+    def __init__(self, render_mode: str = "rgb_array", n_substeps: int = 20) -> None:
         self.render_mode = render_mode
         self.n_substeps = n_substeps
         self.timestep = 1.0 / 500
@@ -22,7 +18,7 @@ class Simulation(ABC):
 
     @property
     def dt(self):
-        """Timestep."""
+        """Timestep"""
         return self.timestep * self.n_substeps
 
     def step(self) -> None:

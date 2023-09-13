@@ -17,26 +17,32 @@ from roborl_navigator.task.reach_task import Reach
 
 class FrankaROSEnv(BaseEnv):
 
-    def __init__(self, orientation_task=False, distance_threshold=0.05, custom_reward=False, experiment=False) -> None:
-        self.sim = ROSSim(orientation_task=orientation_task, experiment=experiment)
-        self.robot = ROSRobot(self.sim, orientation_task=orientation_task)
+    def __init__(
+            self,
+            orientation_task: bool = False,
+            distance_threshold: float = 0.05,
+            goal_range: float = 0.3,
+            demonstration: bool = False,
+            real_robot: bool = False,
+    ) -> None:
+        self.sim = ROSSim(orientation_task=orientation_task, demonstration=demonstration)
+        self.robot = ROSRobot(self.sim, orientation_task=orientation_task, real_robot=real_robot)
         self.task = Reach(
             self.sim,
             self.robot,
             reward_type="dense",
             orientation_task=orientation_task,
             distance_threshold=distance_threshold,
-            custom_reward=custom_reward,
-            experiment=experiment,
+            demonstration=demonstration,
+            goal_range=goal_range,
         )
-        self.experiment = experiment
+        self.demonstration = demonstration
         super().__init__()
-
 
     def reset(
             self, seed: Optional[int] = None, options: Optional[dict] = None
     ) -> Tuple[Dict[str, np.ndarray], Dict[str, Any]]:
-        if self.experiment and options and "goal" in options:
+        if self.demonstration and options and "goal" in options:
             self.task.set_goal(options["goal"])
         else:
             super().reset(seed=seed, options=options)
@@ -58,7 +64,7 @@ class FrankaROSEnv(BaseEnv):
         return observation, reward, terminated, truncated, info
 
     def close(self) -> None:
-        self.sim.close()
+        pass
 
     def render(self) -> Optional[np.ndarray]:
-        return self.sim.render()
+        pass

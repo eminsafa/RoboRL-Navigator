@@ -11,10 +11,7 @@ from roborl_navigator.utils import (
 class BulletPanda(Robot):
 
     def __init__(self, sim: BulletSim, orientation_task: bool = False) -> None:
-
         super().__init__(sim, orientation_task)
-
-        # Bullet Specific
         self.joint_indices = np.array([0, 1, 2, 3, 4, 5, 6])
         self.joint_forces = np.array([87.0, 87.0, 87.0, 87.0, 12.0, 120.0, 120.0])
         self.body_name = "panda"
@@ -91,4 +88,3 @@ class BulletPanda(Robot):
             basePosition=base_position,
             useFixedBase=True,
         )
-

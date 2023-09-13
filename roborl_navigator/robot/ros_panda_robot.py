@@ -16,10 +16,11 @@ except ImportError:
 
 class ROSRobot(Robot):
 
-    def __init__(self, sim: ROSSim, orientation_task: bool = False, real_panda=False) -> None:
+    def __init__(self, sim: ROSSim, orientation_task: bool = False, real_robot: bool = False) -> None:
         super().__init__(sim, orientation_task)
-        robot_name = "panda" if not real_panda else "fr3"
-        self.move_group = moveit_commander.MoveGroupCommander(robot_name + "_manipulator")
+        self.real_robot = real_robot
+        self.robot_name = "fr3" if real_robot else "panda"
+        self.move_group = moveit_commander.MoveGroupCommander(self.robot_name + "_manipulator")
         self.status_queue = deque(maxlen=5)
 
     def get_ee_position(self) -> np.ndarray:
@@ -49,7 +50,7 @@ class ROSRobot(Robot):
         return np.zeros(3)
 
     def get_target_arm_angles(self, joint_actions: np.ndarray) -> np.ndarray:
-        joint_actions = joint_actions * 0.05  # @todo limit maximum change in position
+        joint_actions = joint_actions * 0.05
         return self.get_joint_angles() + joint_actions
 
     def get_joint_angles(self) -> np.ndarray:
@@ -85,21 +86,31 @@ class ROSRobot(Robot):
         self.set_joint_angles(self.neutral_joint_values)
 
     def control_joints(self, joint_values: np.ndarray) -> PlannerResult:
-        try:
-            success, plan, _, _ = self.move_group.plan(joint_values)
-        except moveit_commander.MoveItCommanderException:
-            return PlannerResult.MOVEIT_ERROR
-        if not success:
-            return PlannerResult.COLLISION
-        try:
+        if self.real_robot:
+            joint_values = joint_values.tolist()
             self.move_group.go(joint_values, True)
-        except moveit_commander.MoveItCommanderException:
-            return PlannerResult.MOVEIT_ERROR
-        self.move_group.stop()
-        return PlannerResult.SUCCESS
+            try:
+                self.move_group.go(joint_values, True)
+            except moveit_commander.MoveItCommanderException:
+                return PlannerResult.MOVEIT_ERROR
+            self.move_group.stop()
+            return PlannerResult.SUCCESS
+        else:
+            try:
+                success, plan, _, _ = self.move_group.plan(joint_values)
+            except moveit_commander.MoveItCommanderException:
+                return PlannerResult.MOVEIT_ERROR
+            if not success:
+                return PlannerResult.COLLISION
+            try:
+                self.move_group.go(joint_values, True)
+            except moveit_commander.MoveItCommanderException:
+                return PlannerResult.MOVEIT_ERROR
+            self.move_group.stop()
+            return PlannerResult.SUCCESS
 
     # ROS Specific
-    def stuck_check(self):
+    def stuck_check(self) -> bool:
         if not self.status_queue:
             return False
         first_value = self.status_queue[0]

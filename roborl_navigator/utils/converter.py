@@ -25,7 +25,8 @@ class PandaConverter:
             [-2.967, 2.967],
         )
 
-    def map(self, value, from_min, from_max, to_min, to_max, round_decimal=2):
+    @staticmethod
+    def map(value, from_min, from_max, to_min, to_max, round_decimal=2):
         clamped_value = max(from_min, min(value, from_max))
         return round(((clamped_value - from_min) / (from_max - from_min)) * (to_max - to_min) + to_min, round_decimal)
 

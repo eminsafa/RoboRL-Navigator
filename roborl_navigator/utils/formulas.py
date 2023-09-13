@@ -1,6 +1,15 @@
 import numpy as np
-from math import cos, sin, sqrt, atan2, asin
-from typing import List, Union
+from math import (
+    asin,
+    atan2,
+    cos,
+    sin,
+    sqrt,
+)
+from typing import (
+    List,
+    Union,
+)
 
 
 def euler_to_quaternion(orientation: Union[np.ndarray, List[float]]) -> np.ndarray:
@@ -16,12 +25,6 @@ def euler_to_quaternion(orientation: Union[np.ndarray, List[float]]) -> np.ndarr
 
 
 def quaternion_to_euler(quaternion: np.ndarray) -> np.ndarray:
-    """
-    Convert a quaternion into euler angles (roll, pitch, yaw)
-    roll is rotation around x in radians (counterclockwise)
-    pitch is rotation around y in radians (counterclockwise)
-    yaw is rotation around z in radians (counterclockwise)
-    """
     x, y, z, w = quaternion
     t0 = +2.0 * (w * x + y * z)
     t1 = +1.0 - 2.0 * (x * x + y * y)
@@ -43,9 +46,9 @@ def spherical_distance(point_a: np.ndarray, point_b: np.ndarray) -> float:
     x1, y1 = point_a
     x2, y2 = point_b
 
-    dlon = x2 - x1
-    dlat = y2 - y1
+    d_lon = x2 - x1
+    d_lat = y2 - y1
 
     # Haversine formula
-    a = sin(dlat/2)**2 + cos(y1) * cos(y2) * sin(dlon/2)**2
+    a = sin(d_lat/2)**2 + cos(y1) * cos(y2) * sin(d_lon/2)**2
     return 2 * atan2(sqrt(a), sqrt(1 - a))
