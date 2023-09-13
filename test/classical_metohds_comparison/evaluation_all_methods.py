@@ -1,16 +1,19 @@
 import json
 
+import gymnasium as gym
 import numpy as np
 import time
 
-from stable_baselines3 import TD3, HerReplayBuffer
-import gymnasium as gym
-import roborl_navigator.environment
+from stable_baselines3 import (
+    HerReplayBuffer,
+    TD3,
+)
 from production.ros_controller import ROSController
+import roborl_navigator.environment
 
 
 save_path = '/assets/evaluation_results/all_evaluation_1.json'
-env = gym.make("RoboRL-Navigator-Franka-ROS", orientation_task=False, custom_reward=False, distance_threshold=0.08)
+env = gym.make("RoboRL-Navigator-Franka-ROS", orientation_task=False, distance_threshold=0.08)
 m_path = '/models/roborl-navigator/TD3_Bullet_0.05_Threshold_200K/model.zip'
 model = TD3.load(m_path, env=env, replay_buffer_class=HerReplayBuffer)
 ros_controller = ROSController()
@@ -54,18 +57,18 @@ for episode in range(100):
         }
 
     rl_episode_total = 0.0
-    for _ in range(50):
+    for _ in range(50):  # 50 is episode timeout limit
         start_time = time.time()
         action = model.predict(observation)
         end_time = time.time()
-        planning_time = round((end_time - start_time)*1000)
+        planning_time = round((end_time - start_time) * 1000)
         rl_episode_total += planning_time
         action = action[0]
         observation, reward, terminated, info = model.env.step(action)
         model.env.render()
         success = info[0].get('is_success', False)
         if terminated or success:
-            print(f"RL EPISODE TOTAL: {rl_episode_total}")
+            print(f"RL Total Training Time of Episode: {rl_episode_total}")
             results[episode]['rl']['total'] = rl_episode_total
             results[episode]['rl']['steps'] = _
             time.sleep(3)

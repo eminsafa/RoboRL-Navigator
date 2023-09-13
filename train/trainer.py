@@ -1,5 +1,7 @@
-import os
-from typing import TypeVar, Optional
+from typing import (
+    Optional,
+    TypeVar,
+)
 
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.logger import configure
@@ -31,4 +33,3 @@ class Trainer:
         )
         self.model.save(self.save_directory + '/model')
         self.model.save_replay_buffer(self.save_directory + '/replay_buffer')
-

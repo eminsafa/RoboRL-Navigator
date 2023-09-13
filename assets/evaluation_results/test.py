@@ -27,7 +27,7 @@ for i in range(100_000):
     results.append(difference)
 
 # Example array of "difference" results (replace this with your actual data)
-#difference_array = np.random.normal(0, 1, 1000)  # Replace with your data or generate data
+# difference_array = np.random.normal(0, 1, 1000)  # Replace with your data or generate data
 results = np.array(results)
 mean = np.mean(results)
 print(f"MEAN: {mean}")
