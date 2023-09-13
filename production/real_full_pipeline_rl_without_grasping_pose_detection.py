@@ -5,13 +5,13 @@ from stable_baselines3 import (
     TD3,
 )
 
-from roborl_navigator.environment.env_panda_ros import FrankaROSEnv
+from roborl_navigator.environment.env_panda_ros import PandaROSEnv
 from roborl_navigator.robot.ros_panda_robot import ROSRobot
 from roborl_navigator.simulation.ros import ROSSim
 
 from ros_controller import ROSController
 
-env = FrankaROSEnv(
+env = PandaROSEnv(
     orientation_task=False,
     distance_threshold=0.03,
     demonstration=True,

@@ -14,7 +14,7 @@ from roborl_navigator.robot.bullet_panda_robot import BulletPanda
 from roborl_navigator.task.reach_task import Reach
 
 
-class FrankaBulletEnv(BaseEnv):
+class PandaBulletEnv(BaseEnv):
     metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(

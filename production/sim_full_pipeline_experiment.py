@@ -13,10 +13,10 @@ import gymnasium as gym
 from roborl_navigator.robot.ros_panda_robot import ROSRobot
 from roborl_navigator.simulation.ros import ROSSim
 from roborl_navigator.utils import distance
-from roborl_navigator.environment.env_panda_ros import FrankaROSEnv
+from roborl_navigator.environment.env_panda_ros import PandaROSEnv
 
 
-env = FrankaROSEnv(
+env = PandaROSEnv(
     orientation_task=False,
     distance_threshold=0.025,
     demonstration=True,

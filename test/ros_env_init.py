@@ -1,12 +1,12 @@
 import numpy as np
 
-from roborl_navigator.environment.env_panda_ros import FrankaROSEnv
+from roborl_navigator.environment.env_panda_ros import PandaROSEnv
 
 """
 TEST Bullet Environment Initialization
 """
 
-env = FrankaROSEnv(orientation_task=True)
+env = PandaROSEnv(orientation_task=True)
 env.reset()
 
 action = np.ones(7)

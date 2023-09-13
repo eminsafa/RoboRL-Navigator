@@ -15,7 +15,7 @@ from roborl_navigator.robot.ros_panda_robot import ROSRobot
 from roborl_navigator.task.reach_task import Reach
 
 
-class FrankaROSEnv(BaseEnv):
+class PandaROSEnv(BaseEnv):
 
     def __init__(
             self,

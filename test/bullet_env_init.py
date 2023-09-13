@@ -1,12 +1,12 @@
 import numpy as np
 
-from roborl_navigator.environment.env_panda_bullet import FrankaBulletEnv
+from roborl_navigator.environment.env_panda_bullet import PandaBulletEnv
 
 """
 TEST Bullet Environment Initialization
 """
 
-env = FrankaBulletEnv(orientation_task=True, render_mode="human")
+env = PandaBulletEnv(orientation_task=True, render_mode="human")
 env.reset()
 
 action = np.ones(7)
