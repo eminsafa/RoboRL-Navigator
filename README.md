@@ -16,7 +16,7 @@ real world.
 
 ## Documentation
 
-
+Documentation is available [here](assets/documentation/documentation.md).
 
 ## Demo
 
