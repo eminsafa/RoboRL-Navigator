@@ -1,6 +1,5 @@
 Environments
 ============
 
-.. -environments:
 
 ENVs

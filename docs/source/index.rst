@@ -1,5 +1,5 @@
 Documentation of RoboRL Navigator
-===================================
+=================================
 
 **RoboRL Navigator** is a project that provides Reinforcement Learning codebase for
 manipulator robots, especially Franka Emika Panda Robot initialized.
@@ -22,6 +22,7 @@ how to :ref:`installation` the project.
 
    installation
    validate-installation
+   environments
    train-your-model
    download-trained-model
    model-evaluation
