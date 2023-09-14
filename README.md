@@ -37,7 +37,9 @@ This project is used by the following groups:
 
 - **CUCR** (Cardiff University Coptutational Robotics Team)
 
+## Demonstration
 
+![Logo](assets/documentation/demo-img.gif)
 
 ## License
 
