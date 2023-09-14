@@ -7,20 +7,39 @@ Grasping Pose Detection (GPD)
    python contact_graspnet/contact_graspnet_server.py
 
 View Grasping Poses
--------------------
+*******************
 
-API Reference for GPD Server
-----------------------------
+.. code:: shell
 
-Local Configuration
-~~~~~~~~~~~~~~~~~~~
+    # make sure conda env activated
+    python3 contact_graspnet/inference.py \
+        --np_path=/path/to/your/data.npy \
+        --forward_passes=5 \
+        --z_range=[0.2,1.1]
+
+
+GPD Server
+**********
+
+Run GPD server
+
+.. code:: shell
+
+    python3 contact_graspnet/contact_graspnet_server.py
+
+
+API Reference
+-------------
+
+
+**Local Configuration**
+
 
 .. code:: http
 
      GET /run
 
 Request
-^^^^^^^
 
 ========= ========== ========================
 Parameter Type       Description
@@ -29,7 +48,6 @@ Parameter Type       Description
 ========= ========== ========================
 
 Response
-^^^^^^^^
 
 ========= ======== =============================
 Parameter Type     Description
@@ -37,8 +55,7 @@ Parameter Type     Description
 ``file``  ``FILE`` **Required**. predictions.npz
 ========= ======== =============================
 
-LAN Configuration
-~~~~~~~~~~~~~~~~~
+**LAN Configuration**
 
 .. code:: http
 
@@ -47,7 +64,7 @@ LAN Configuration
 .. _request-1:
 
 Request
-^^^^^^^
+
 
 ========= ======== ===========================
 Parameter Type     Description
@@ -58,7 +75,7 @@ Parameter Type     Description
 .. _response-1:
 
 Response
-^^^^^^^^
+
 
 ========= ======== =============================
 Parameter Type     Description
