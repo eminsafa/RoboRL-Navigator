@@ -19,7 +19,6 @@ Contents
 --------
 
 .. toctree::
-    :caption: Documentation
 
     installation
     train_your_model
