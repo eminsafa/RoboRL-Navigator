@@ -1,5 +1,5 @@
 Environments
-=====
+============
 
 .. _installation:
 

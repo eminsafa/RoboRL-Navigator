@@ -13,7 +13,7 @@ python3 test/ros_env_init.py
 ```
 
 Running ROS and Gazebo
-======================
+----------------------
 
 Run following command to run ROS with simulation launch file
 ```shell

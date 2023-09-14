@@ -34,12 +34,11 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ['_static']
 html_logo = "_static/logo_sm.png"
 html_theme_options = {
-    'logo_only': False,
+    'logo_only': True,
     'display_version': False,
     'style_nav_header_background': 'lightgray',
     'collapse_navigation': True,
     'sticky_navigation': True,
-    'navigation_depth': 2,
 }
 
 # -- Options for EPUB output

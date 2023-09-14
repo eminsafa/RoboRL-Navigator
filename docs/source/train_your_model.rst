@@ -13,18 +13,3 @@ You can check environment parameters :doc:`environments`
 
 Your trained model will be saved in ``~/RoboRL-Navigator/models/roborl-navigator/`` directory.
 Please note that, git does not track this directory as file size is over the limit.
-
-Download Trained Model
-======================
-
-You can install pre-trained model `here <https://drive.google.com/file/d/1EMeIu4W3FPgGrlhQ_Q8RUQBGgJ0cb7uQ/view?usp=sharing>`__.
-Extract downloaded model to ``models/`` directory, It will look like this:
-
-.. code:: shell
-
-    external
-    └── models
-       └── roborl-navigator
-           └── TD3_Bullet_0.05_Threshold_200K
-               ├── model.zip
-

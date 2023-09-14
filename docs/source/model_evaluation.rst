@@ -13,7 +13,7 @@ To test the models on Bullet simulation, you can basically replace
 ``RoboRL-Navigator-Panda-ROS`` with ``RoboRL-Navigator-Panda-ROS``.
 
 Comparison with Classical Methods
-=================================
+---------------------------------
 
 .. code:: shell
 

@@ -21,6 +21,7 @@ Contents
 .. toctree::
 
     installation
+    validate_installation
     train_your_model
     download_trained_model
     model_evaluation
