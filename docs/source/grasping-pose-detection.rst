@@ -61,7 +61,6 @@ Parameter Type     Description
 
      GET /run
 
-.. _request-1:
 
 Request
 
@@ -72,7 +71,6 @@ Parameter Type     Description
 ``file``  ``FILE`` **Required**. data.npy file
 ========= ======== ===========================
 
-.. _response-1:
 
 Response
 
