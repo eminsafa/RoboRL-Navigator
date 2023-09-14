@@ -15,7 +15,6 @@ class BaseEnv(gym.Env):
     task = None
 
     def __init__(self) -> None:
-
         observation, _ = self.reset()
 
         observation_shape = observation["observation"].shape
@@ -45,7 +44,7 @@ class BaseEnv(gym.Env):
         }
 
     def reset(
-            self, seed: Optional[int] = None, options: Optional[dict] = None
+        self, seed: Optional[int] = None, options: Optional[dict] = None
     ) -> Tuple[Dict[str, np.ndarray], Dict[str, Any]]:
         return NotImplemented
 

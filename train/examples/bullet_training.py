@@ -14,7 +14,7 @@ env = gym.make(
     render_mode="human",
     orientation_task=False,
     distance_threshold=0.05,
-    goal_range=0.2
+    goal_range=0.2,
 )
 
 model = TD3(policy="MultiInputPolicy", env=env, replay_buffer_class=HerReplayBuffer, verbose=1)

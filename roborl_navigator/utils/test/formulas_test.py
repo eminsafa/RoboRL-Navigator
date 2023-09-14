@@ -13,18 +13,21 @@ class TestFormulas(unittest.TestCase):
         pb_quaternion = getQuaternionFromEuler(euler_orientation)
         util_quaternion = euler_to_quaternion(euler_orientation)
         np.testing.assert_allclose(
-            pb_quaternion, util_quaternion, atol=1e-3,
-            err_msg="Converted joint state does not match the expected result."
+            pb_quaternion,
+            util_quaternion,
+            atol=1e-3,
+            err_msg="Converted joint state does not match the expected result.",
         )
         pb_euler = getEulerFromQuaternion(util_quaternion)
         util_euler = quaternion_to_euler(pb_quaternion)
         np.testing.assert_allclose(
-            euler_orientation, pb_euler, atol=1e-3,
-            err_msg="Converted joint state does not match the expected result."
+            euler_orientation, pb_euler, atol=1e-3, err_msg="Converted joint state does not match the expected result."
         )
         np.testing.assert_allclose(
-            euler_orientation, util_euler, atol=1e-3,
-            err_msg="Converted joint state does not match the expected result."
+            euler_orientation,
+            util_euler,
+            atol=1e-3,
+            err_msg="Converted joint state does not match the expected result.",
         )
 
 

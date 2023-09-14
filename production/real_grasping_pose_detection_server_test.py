@@ -15,5 +15,3 @@ for i in range(10):
     saved_file_path = ros_controller.request_graspnet_result(remote_ip=remote_ip)
     # Parse Responded File
     target_pose_by_camera = ros_controller.process_grasping_results(path=saved_file_path)
-
-

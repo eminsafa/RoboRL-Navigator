@@ -29,7 +29,7 @@ ros_controller = ROSController(real_robot=True)
 # Open the gripper
 ros_controller.hand_open()
 
-target_pose_array = [0.8, -0.1, .11]
+target_pose_array = [0.8, -0.1, 0.11]
 
 print(f"Desired Goal: {target_pose_array[:3]}")
 

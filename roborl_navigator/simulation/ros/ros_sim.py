@@ -91,9 +91,7 @@ class ROSSim(Simulation):
         model_state.position.z = position[2]
 
         if orientation is not None:
-            quaternion = euler_to_quaternion(
-                orientation
-            )
+            quaternion = euler_to_quaternion(orientation)
             model_state.orientation.x = quaternion[0]
             model_state.orientation.y = quaternion[1]
             model_state.orientation.z = quaternion[2]

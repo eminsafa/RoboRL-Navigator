@@ -22,6 +22,3 @@ ros_controller.get_pose_goal_plan_with_duration(pose, 'rrt')
 ros_controller.go_to_pose_goal(pose)
 
 ros_controller.hand_close()
-
-
-

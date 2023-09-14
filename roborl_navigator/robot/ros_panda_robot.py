@@ -25,25 +25,21 @@ class ROSRobot(Robot):
 
     def get_ee_position(self) -> np.ndarray:
         position = self.move_group.get_current_pose().pose.position
-        return np.array(
-            [
-                position.x,
-                position.y,
-                position.z,
-            ]
-        ).astype(np.float32)
+        return np.array([
+            position.x,
+            position.y,
+            position.z,
+        ]).astype(np.float32)
 
     def get_ee_orientation(self) -> np.ndarray:
         orientation = self.move_group.get_current_pose().pose.orientation
         return np.array(
-            euler_from_quaternion(
-                [
-                    orientation.x,
-                    orientation.y,
-                    orientation.z,
-                    orientation.w,
-                ]
-            )
+            euler_from_quaternion([
+                orientation.x,
+                orientation.y,
+                orientation.z,
+                orientation.w,
+            ])
         ).astype(np.float32)
 
     def get_ee_velocity(self) -> np.ndarray:

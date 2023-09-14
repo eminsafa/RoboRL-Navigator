@@ -18,12 +18,12 @@ from roborl_navigator.task.reach_task import Reach
 class PandaROSEnv(BaseEnv):
 
     def __init__(
-            self,
-            orientation_task: bool = False,
-            distance_threshold: float = 0.05,
-            goal_range: float = 0.3,
-            demonstration: bool = False,
-            real_robot: bool = False,
+        self,
+        orientation_task: bool = False,
+        distance_threshold: float = 0.05,
+        goal_range: float = 0.3,
+        demonstration: bool = False,
+        real_robot: bool = False,
     ) -> None:
         self.sim = ROSSim(orientation_task=orientation_task, demonstration=demonstration)
         self.robot = ROSRobot(self.sim, orientation_task=orientation_task, real_robot=real_robot)
@@ -40,7 +40,7 @@ class PandaROSEnv(BaseEnv):
         super().__init__()
 
     def reset(
-            self, seed: Optional[int] = None, options: Optional[dict] = None
+        self, seed: Optional[int] = None, options: Optional[dict] = None
     ) -> Tuple[Dict[str, np.ndarray], Dict[str, Any]]:
         if self.demonstration and options and "goal" in options:
             self.task.set_goal(options["goal"])
