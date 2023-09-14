@@ -51,4 +51,7 @@ This project is used by the following groups:
 # Paper
 # Graspnet
 # 
+
+python3 -m pyink --line-length 120 -S .
+
 ```
