@@ -15,4 +15,3 @@ Extract downloaded model to ``models/`` directory, It will look like this:
                ├── model.zip
 
 
-

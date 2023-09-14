@@ -26,7 +26,6 @@ how to :ref:`installation` the project.
    train-your-model
    download-trained-model
    model-evaluation
+   grasping-pose-detection
    simulation-demonstration
    real-world-demonstration
-   grasping-pose-detection
-
