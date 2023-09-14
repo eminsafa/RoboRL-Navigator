@@ -19,7 +19,7 @@ Contents
 --------
 
 .. toctree::
-   :caption: Documentation
+    :caption: Documentation
 
     installation
     train_your_model
