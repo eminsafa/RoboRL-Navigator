@@ -7,7 +7,7 @@ Grasping Pose Detection (GPD)
    python contact_graspnet/contact_graspnet_server.py
 
 View Grasping Poses
-*******************
+-------------------
 
 .. code:: shell
 
@@ -19,7 +19,7 @@ View Grasping Poses
 
 
 GPD Server
-**********
+----------
 
 Run GPD server
 
