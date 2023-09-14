@@ -32,7 +32,7 @@ templates_path = ['_templates']
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ['_static']
-html_logo = "https://sphinx-rtd-theme.readthedocs.io/en/stable/_static/logo-wordmark-light.svg"
+html_logo = "_static/logo_sm.png"
 html_theme_options = {
     'logo_only': False,
     'display_version': False,
