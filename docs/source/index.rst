@@ -21,8 +21,8 @@ Contents
 .. toctree::
 
     installation
-    validate_installation
-    train_your_model
+    validate-installation
+    train-your-model
     download_trained_model
     model_evaluation
     grasping_pose_detection
