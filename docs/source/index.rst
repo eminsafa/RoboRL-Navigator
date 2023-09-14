@@ -25,9 +25,9 @@ Contents
     installation
     validate-installation
     train-your-model
-    download_trained_model
-    model_evaluation
-    grasping_pose_detection
-    simulation_demonstration
-    real_world_demonstration
+    download-trained-model
+    model-evaluation
+    grasping-pose_detection
+    simulation-demonstration
+    real-world-demonstration
 
