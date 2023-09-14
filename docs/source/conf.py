@@ -36,10 +36,14 @@ html_logo = "_static/logo.png"
 html_theme_options = {
     'logo_only': False,
     'display_version': False,
-    'style_nav_header_background': 'white',
+    'style_nav_header_background': 'lightgray',
     'collapse_navigation': True,
     'sticky_navigation': True,
     'navigation_depth': 2,
+    "logo": {
+        "image_light": "_static/logo.png",
+        "image_dark": "_static/logo.png",
+    }
 }
 
 # -- Options for EPUB output
