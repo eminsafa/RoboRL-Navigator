@@ -35,8 +35,7 @@ ROS and Gazebo Installation
 
 It is required to install ROS Noetic version. This guide is for Cardiff
 University Computational Robotics Team. You can install ROS by following
-official instructions
-`here <http://wiki.ros.org/noetic/Installation>`__.
+official instructions `here <http://wiki.ros.org/noetic/Installation>`__.
 
 Install and Build ``tue-env``
 

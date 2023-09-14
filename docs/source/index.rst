@@ -22,6 +22,7 @@ Contents
 
     installation
     train_your_model
+    download_trained_model
     model_evaluation
     grasping_pose_detection
     simulation_demonstration
