@@ -15,19 +15,17 @@ how to :ref:`installation` the project.
 
    This project is under active development.
 
-Contents
---------
 
 .. toctree::
    :maxdepth: 2
    :caption: Tutorial
 
-    installation
-    validate-installation
-    train-your-model
-    download-trained-model
-    model-evaluation
-    grasping-pose_detection
-    simulation-demonstration
-    real-world-demonstration
+   installation
+   validate-installation
+   train-your-model
+   download-trained-model
+   model-evaluation
+   grasping-pose_detection
+   simulation-demonstration
+   real-world-demonstration
 
