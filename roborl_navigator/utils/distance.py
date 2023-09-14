@@ -23,12 +23,7 @@ def distance(a: np.ndarray, b: np.ndarray, cr=False) -> np.ndarray:
     if not cr:
         return np.linalg.norm(a - b, axis=-1)
     if len(a.shape) == 2:
-        return np.array(
-            [
-                custom_distance(a[i], b[i])
-                for i in range(a.shape[0])
-            ]
-        )
+        return np.array([custom_distance(a[i], b[i]) for i in range(a.shape[0])])
     return custom_distance(a, b)
 
 
@@ -37,7 +32,7 @@ def custom_distance(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     pd = np.linalg.norm(a[:3] - b[:3])  # position_distance
     # Orientation: max distance = 6.38, mean = 1.52
     od = spherical_distance(a[3:], b[3:]) * 2
-    return pd * .6 + od * .35 + pd*od
+    return pd * 0.6 + od * 0.35 + pd * od
 
 
 def angle_distance(a: np.ndarray, b: np.ndarray) -> np.ndarray:

@@ -8,10 +8,7 @@ import gymnasium as gym
 import roborl_navigator.environment
 
 
-env = gym.make(
-    "RoboRL-Navigator-Panda-ROS",
-    orientation_task=False,
-    distance_threshold=0.05)
+env = gym.make("RoboRL-Navigator-Panda-ROS", orientation_task=False, distance_threshold=0.05)
 
 model = TD3.load(
     '/home/juanhernandezvega/dev/RoboRL-Navigator/models/roborl-navigator/TD3_Bullet_0.05_Threshold_200K/model.zip',

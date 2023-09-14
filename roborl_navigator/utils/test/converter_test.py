@@ -13,8 +13,10 @@ class TestConversion(unittest.TestCase):
         reversed_joints = panda_converter.bullet_to_real(bullet_joints)
 
         np.testing.assert_allclose(
-            initial_joints, reversed_joints, atol=1e-3,
-            err_msg="Converted joint state does not match the expected result."
+            initial_joints,
+            reversed_joints,
+            atol=1e-3,
+            err_msg="Converted joint state does not match the expected result.",
         )
 
 

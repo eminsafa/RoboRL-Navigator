@@ -31,16 +31,19 @@ class PandaConverter:
         return round(((clamped_value - from_min) / (from_max - from_min)) * (to_max - to_min) + to_min, round_decimal)
 
     def zip(self, values, limits, obs_range):
-        return np.array([
-            max(obs_range[0], min(obs_range[1], self.map(v, limits[i][0], limits[i][1], obs_range[0], obs_range[1])))
-            for i, v in enumerate(values)
-        ])
+        return np.array(
+            [
+                max(
+                    obs_range[0], min(obs_range[1], self.map(v, limits[i][0], limits[i][1], obs_range[0], obs_range[1]))
+                )
+                for i, v in enumerate(values)
+            ]
+        )
 
     def unzip(self, values, limits, obs_range):
-        return np.array([
-            self.map(v, obs_range[0], obs_range[1], limits[i][0], limits[i][1])
-            for i, v in enumerate(values)
-        ])
+        return np.array(
+            [self.map(v, obs_range[0], obs_range[1], limits[i][0], limits[i][1]) for i, v in enumerate(values)]
+        )
 
     @staticmethod
     def map_value(value, from_range, to_range):

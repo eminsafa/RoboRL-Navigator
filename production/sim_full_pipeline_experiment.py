@@ -68,6 +68,3 @@ for _ in range(50):
 
 # Close Gripper
 ros_controller.hand_close()
-
-
-

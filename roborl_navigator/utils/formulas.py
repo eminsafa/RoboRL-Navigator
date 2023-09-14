@@ -50,5 +50,5 @@ def spherical_distance(point_a: np.ndarray, point_b: np.ndarray) -> float:
     d_lat = y2 - y1
 
     # Haversine formula
-    a = sin(d_lat/2)**2 + cos(y1) * cos(y2) * sin(d_lon/2)**2
+    a = sin(d_lat / 2) ** 2 + cos(y1) * cos(y2) * sin(d_lon / 2) ** 2
     return 2 * atan2(sqrt(a), sqrt(1 - a))

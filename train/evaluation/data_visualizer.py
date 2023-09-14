@@ -13,7 +13,9 @@ plt.figure(figsize=(14, 6))
 for model, d in models.items():
     i = d['i']
     plt.subplot(1, 3, i)
-    data = pd.read_csv(f'/Users/safa/qa/RoboRL-Navigator/models/roborl-navigator/model_comparison/{model}_HER_50K/logs/progress.csv')
+    data = pd.read_csv(
+        f'/Users/safa/qa/RoboRL-Navigator/models/roborl-navigator/model_comparison/{model}_HER_50K/logs/progress.csv'
+    )
     # Extract the 'rollout/success_rate' column
 
     success_rate = data['rollout/success_rate']

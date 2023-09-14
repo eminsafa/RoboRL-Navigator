@@ -18,11 +18,11 @@ class PandaBulletEnv(BaseEnv):
     metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(
-            self,
-            render_mode: str = "human",
-            orientation_task: bool = False,
-            distance_threshold: float = 0.05,
-            goal_range: float = 0.3,
+        self,
+        render_mode: str = "human",
+        orientation_task: bool = False,
+        distance_threshold: float = 0.05,
+        goal_range: float = 0.3,
     ) -> None:
         self.sim = BulletSim(render_mode=render_mode, n_substeps=30, orientation_task=orientation_task)
         self.robot = BulletPanda(self.sim, orientation_task=orientation_task)
@@ -32,13 +32,13 @@ class PandaBulletEnv(BaseEnv):
             reward_type="dense",
             orientation_task=orientation_task,
             distance_threshold=distance_threshold,
-            goal_range=goal_range
+            goal_range=goal_range,
         )
         super().__init__()
 
         self.render_width = 700
         self.render_height = 400
-        self.render_target_position = (np.array([0.0, 0.0, 0.72]))
+        self.render_target_position = np.array([0.0, 0.0, 0.72])
         self.render_distance = 2
         self.render_yaw = 45
         self.render_pitch = -30
@@ -55,7 +55,7 @@ class PandaBulletEnv(BaseEnv):
         self.a = None
 
     def reset(
-            self, seed: Optional[int] = None, options: Optional[dict] = None
+        self, seed: Optional[int] = None, options: Optional[dict] = None
     ) -> Tuple[Dict[str, np.ndarray], Dict[str, Any]]:
         super().reset(seed=seed, options=options)
         self.task.np_random, seed = seeding.np_random(seed)

@@ -100,16 +100,14 @@ class ROSController:
         position = np.random.uniform(0.1, 0.3, size=(3,))
         orientation = Rotation.random().as_quat()
         return self.create_pose(position, orientation)
-    
+
     def get_ee_position(self) -> np.ndarray:
         position = self.move_group.get_current_pose().pose.position
-        return np.array(
-            [
-                position.x,
-                position.y,
-                position.z,
-            ]
-        ).astype(np.float32)
+        return np.array([
+            position.x,
+            position.y,
+            position.z,
+        ]).astype(np.float32)
 
     # PLANNING OPERATIONS
 
@@ -166,13 +164,11 @@ class ROSController:
 
     def camera_info_callback(self, msg: Any) -> None:
         cam_info = msg.K
-        self.camera_info = np.array(
-            [
-                [cam_info[0], 0.0, cam_info[2]],
-                [0.0, cam_info[4], cam_info[5]],
-                [0.0, 0.0, 0.0],
-            ]
-        )
+        self.camera_info = np.array([
+            [cam_info[0], 0.0, cam_info[2]],
+            [0.0, cam_info[4], cam_info[5]],
+            [0.0, 0.0, 0.0],
+        ])
         time.sleep(1)
 
     def capture_image_and_save_info(self) -> str:
@@ -184,7 +180,7 @@ class ROSController:
             "rgb": np.array(self.rgb_array),
             "depth": np.array(self.depth_array) / 1000.0,
             "label": np.zeros((720, 1280), dtype=np.uint8),
-            "K": self.camera_info
+            "K": self.camera_info,
         }
         np.save(self.save_dir + '/data.npy', data_dict)
         np.save(self.save_dir + "/rgb.npy", np.array(self.rgb_array))
@@ -260,9 +256,7 @@ class ROSController:
 
     def transform_camera_to_world(self, cv_pose: Union[np.ndarray, list]) -> PoseStamped:
         base_pose = PoseStamped()
-        quaternion = quaternion_from_euler(
-            np.double(cv_pose[3]), np.double(cv_pose[4]), np.double(cv_pose[5])
-        )
+        quaternion = quaternion_from_euler(np.double(cv_pose[3]), np.double(cv_pose[4]), np.double(cv_pose[5]))
         base_pose.pose.position.x = cv_pose[0]
         base_pose.pose.position.y = cv_pose[1]
         base_pose.pose.position.z = cv_pose[2]
@@ -309,7 +303,7 @@ class ROSController:
     def add_collision_object(self) -> None:
         p = PoseStamped()
         p.header.frame_id = self.robot_name + "_link0"
-        p.pose.position.x = 0.
-        p.pose.position.y = 0.
+        p.pose.position.x = 0.0
+        p.pose.position.y = 0.0
         p.pose.position.z = -0.01
         self.scene.add_box("table", p, (2.0, 2.0, 0.1))

@@ -25,12 +25,10 @@ class Robot(ABC):
 
     def get_obs(self) -> np.ndarray:
         if self.orientation_task:
-            return np.concatenate(
-                [
-                    np.array(self.get_ee_position()),
-                    np.array(self.get_ee_orientation())[:2],
-                ]
-            )
+            return np.concatenate([
+                np.array(self.get_ee_position()),
+                np.array(self.get_ee_orientation())[:2],
+            ])
         else:
             return np.array(self.get_ee_position())
 

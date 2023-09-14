@@ -13,11 +13,11 @@ from roborl_navigator.simulation import Simulation
 class BulletSim(Simulation):
 
     def __init__(
-            self,
-            render_mode: Optional[str] = "rgb_array",
-            n_substeps: Optional[int] = 20,
-            renderer: Optional[str] = "Tiny",
-            orientation_task: Optional[bool] = False,
+        self,
+        render_mode: Optional[str] = "rgb_array",
+        n_substeps: Optional[int] = 20,
+        renderer: Optional[str] = "Tiny",
+        orientation_task: Optional[bool] = False,
     ) -> None:
         super().__init__(render_mode, n_substeps)
 
@@ -59,14 +59,14 @@ class BulletSim(Simulation):
             self.physics_client.disconnect()
 
     def render(
-            self,
-            width: int = 720,
-            height: int = 480,
-            target_position: Optional[np.ndarray] = None,
-            distance: float = 1.4,
-            yaw: float = 45,
-            pitch: float = -30,
-            roll: float = 0,
+        self,
+        width: int = 720,
+        height: int = 480,
+        target_position: Optional[np.ndarray] = None,
+        distance: float = 1.4,
+        yaw: float = 45,
+        pitch: float = -30,
+        roll: float = 0,
     ) -> Optional[np.ndarray]:
         if self.render_mode == "rgb_array":
             target_position = target_position if target_position is not None else np.zeros(3)
@@ -165,14 +165,14 @@ class BulletSim(Simulation):
             self.create_orientation_mark(np.zeros(3))
 
     def create_geometry(
-            self,
-            body_name: str,
-            geom_type: int,
-            mass: float = 0.0,
-            position: Optional[np.ndarray] = None,
-            ghost: bool = False,
-            visual_kwargs: Dict[str, Any] = {},
-            collision_kwargs: Dict[str, Any] = {},
+        self,
+        body_name: str,
+        geom_type: int,
+        mass: float = 0.0,
+        position: Optional[np.ndarray] = None,
+        ghost: bool = False,
+        visual_kwargs: Dict[str, Any] = {},
+        collision_kwargs: Dict[str, Any] = {},
     ) -> None:
         """Create a geometry."""
         position = position if position is not None else np.zeros(3)
@@ -189,11 +189,11 @@ class BulletSim(Simulation):
         )
 
     def create_box(
-            self,
-            body_name: str,
-            half_extents: np.ndarray,
-            position: np.ndarray,
-            rgba_color: Optional[np.ndarray] = None,
+        self,
+        body_name: str,
+        half_extents: np.ndarray,
+        position: np.ndarray,
+        rgba_color: Optional[np.ndarray] = None,
     ) -> None:
         rgba_color = rgba_color if rgba_color is not None else np.zeros(4)
         specular_color = np.zeros(3)
@@ -229,7 +229,7 @@ class BulletSim(Simulation):
         self.create_box(
             body_name="table",
             half_extents=np.array([length, width, height]) / 2,
-            position=np.array([length/2, 0.0, - height / 2]),
+            position=np.array([length / 2, 0.0, -height / 2]),
             rgba_color=np.array([0.95, 0.95, 0.95, 1]),
         )
 
