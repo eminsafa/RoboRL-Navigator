@@ -14,7 +14,7 @@ real world.
 
 ## Documentation
 
-Documentation is available [here](assets/documentation/documentation.md).
+Documentation is available [here](https://roborl-navigator.readthedocs.io/en/latest/).
 
 ## Demo
 
