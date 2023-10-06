@@ -1,8 +1,7 @@
 Installation
 ============
 
-Suggested Python is **3.8**. You can follow this documentation to use
-multiple Python versions.
+Suggested Python version is **3.8**.
 
 Repository and Python Environment
 ---------------------------------
@@ -20,7 +19,6 @@ Create Python environment
    cd RoboRL-Navigator
    python3 -m venv roborl-navigator-env
    source roborl-navigator-env/bin/activate
-   pip install 
 
 As this project use model-based importing, please make sure you have
 added module path as environment variable.
