@@ -48,10 +48,6 @@ Environment Name: ``RoboRL-Navigator-Panda-ROS``
      - Values
      - Default
      - Description
-   * - ``render_mode``
-     - ``human, rgb_array``
-     - ``human``
-     - Rendering mode of the physics engine
    * - ``orientation_task``
      - ``boolean``
      - ``False``

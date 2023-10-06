@@ -1,17 +1,11 @@
 Simulation Demonstration
 ========================
 
-Gazebo, ROS sim
-
-You can install pre-trained model `here <https://drive.google.com/file/d/1EMeIu4W3FPgGrlhQ_Q8RUQBGgJ0cb7uQ/view?usp=sharing>`__.
-Extract downloaded model to ``models/`` directory, It will look like this:
+- Run test-franka-simulation-full
+- Run RVIZ
+- Run Grasping Pose Detection Server locally or remote
 
 .. code:: shell
 
-    external
-    └── models
-       └── roborl-navigator
-           └── TD3_Bullet_0.05_Threshold_200K
-               ├── model.zip
-
+    python3 production/sim_full_pipeline_experiment.py
 

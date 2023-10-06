@@ -1,8 +1,8 @@
 Download Trained Model
 ======================
 
-You can install pre-trained model `here <https://drive.google.com/file/d/1EMeIu4W3FPgGrlhQ_Q8RUQBGgJ0cb7uQ/view?usp=sharing>`__.
-Extract downloaded model to ``models/`` directory, It will look like this:
+You can download pre-trained model from `here <https://drive.google.com/file/d/1EMeIu4W3FPgGrlhQ_Q8RUQBGgJ0cb7uQ/view?usp=sharing>`__.
+Extract downloaded file to ``models/`` directory, It will look like this:
 
 .. code:: shell
 
