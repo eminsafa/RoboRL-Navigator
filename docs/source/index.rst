@@ -23,20 +23,17 @@ how to :ref:`installation` the project.
    installation
    validate-installation
 
-.. toctree::
    :maxdepth: 2
    :caption: Train
    environments
    train-your-model
    download-trained-model
 
-.. toctree::
    :maxdepth: 2
    :caption: Test
    model-evaluation
    grasping-pose-detection
 
-.. toctree::
    :maxdepth: 2
    :caption: Demonstrate
    simulation-demonstration
