@@ -14,7 +14,7 @@ Documentation is available [here](https://roborl-navigator.readthedocs.io/en/lat
 
 ## Demo
 
-[![Watch the video](https://raw.githubusercontent.com/eminsafa/RoboRL-Navigator/master/assets/VideoCover.png)](https://www.youtube.com/watch?v=CJJvQztncOw)
+[![Watch the video](https://raw.githubusercontent.com/eminsafa/RoboRL-Navigator/master/assets/VideoPlayCover.png)](https://www.youtube.com/watch?v=CJJvQztncOw)
 
 ## Examples
 
