@@ -3,11 +3,7 @@
 <br>
 <br>
 
-RoboRL Navigator is a project that provides Reinforcement Learning codebase for 
-manipulator robots, especially Franka Emika Panda Robot initialized.
-It has Bullet and ROS Gazebo simulation environments to train the model
-to reach given position. It also uses an open-source Grasping Pose Detection project
-that can be tested on Gazebo Simulation or Real World.
+**RoboRL Navigator** is a project that offers a codebase for Reinforcement Learning tailored to manipulator robots, particularly the Franka Emika Panda Robot. The project includes both Bullet and ROS Gazebo simulation environments that can be used to train the model to reach a specified pose. It also utilizes an open-source Grasping Pose Detection project that can be tested in either the Gazebo Simulation environment or the Real World.
 
 RoboRL Navigator, already sim-to-real adjustment. Thus, trained models can be tested on
 real world.
@@ -18,6 +14,7 @@ Documentation is available [here](https://roborl-navigator.readthedocs.io/en/lat
 
 ## Demo
 
+[![Watch the video](https://raw.githubusercontent.com/eminsafa/RoboRL-Navigator/master/assets/VideoCover.png)](https://www.youtube.com/watch?v=CJJvQztncOw)
 
 ## Examples
 

@@ -14,16 +14,16 @@ for model, d in models.items():
     i = d['i']
     plt.subplot(1, 3, i)
     data = pd.read_csv(
-        f'/Users/safa/qa/RoboRL-Navigator/models/roborl-navigator/model_comparison/{model}_HER_50K/logs/progress.csv'
+        f'/Users/safa.tok/qa/RoboRL-Navigator/models/roborl-navigator/model_comparison/{model}_HER_50K/logs/progress.csv'
     )
     # Extract the 'rollout/success_rate' column
 
     success_rate = data['rollout/success_rate']
     plt.plot(success_rate, linestyle='-', color=d['color'])
     plt.xlabel('Steps (K)')
-    plt.ylabel('Success Rate (%)')
+    plt.ylabel('Success Rate')
     plt.title(f'{model} Success Rate Over Time')
-    plt.xlim(0, 120)  # Set the X-axis limits to be from 1 to 5
+    plt.xlim(0, 100)  # Set the X-axis limits to be from 1 to 5
     plt.ylim(0, 1.05)
     plt.grid(True)
 
