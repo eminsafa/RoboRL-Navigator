@@ -6,7 +6,7 @@ from roborl_navigator.environment.env_panda_bullet import PandaBulletEnv
 TEST Bullet Environment Initialization
 """
 
-env = PandaBulletEnv(orientation_task=True, render_mode="human")
+env = PandaBulletEnv(orientation_task=False, render_mode="human", goal_range=0.2)
 env.reset()
 
 action = np.ones(7)

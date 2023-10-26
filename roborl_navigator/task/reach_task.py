@@ -1,3 +1,4 @@
+import math
 from typing import (
     Any,
     Dict,
@@ -35,9 +36,10 @@ class Reach:
         self.distance_threshold = distance_threshold
         self.demonstration = demonstration
 
+        self.shelf_distance = 0.65
         # min X can be 0.07
-        self.goal_range_low = np.array([0.5 - (goal_range / 2), -goal_range / 2, 0.05])
-        self.goal_range_high = np.array([0.5 + (goal_range / 2), goal_range / 2, goal_range / 2])
+        self.goal_range_low = np.array([self.shelf_distance - (goal_range / 2), -goal_range / 2, 0.05])
+        self.goal_range_high = np.array([self.shelf_distance + (goal_range / 2), goal_range / 2, 0.30])
         self.orientation_range_low = np.array([-3, -0.8])
         self.orientation_range_high = np.array([-2, 0.4])
 
@@ -49,6 +51,7 @@ class Reach:
 
     def reset(self) -> None:
         self.goal = self._sample_goal()
+        self.sim.set_base_pose("shelf", np.array([self.shelf_distance, 0, 0]), euler_to_quaternion([0, 0, math.pi/2]))
         if not self.demonstration:
             self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
             if self.orientation_task:

@@ -52,6 +52,9 @@ class BulletSim(Simulation):
         """Step the simulation."""
         for _ in range(self.n_substeps):
             self.physics_client.stepSimulation()
+        contacts = p.getContactPoints(bodyA=self._bodies_idx['panda'], bodyB=self._bodies_idx['shelf'])
+        if contacts:  # If the list is not empty, there's a collision
+            print("Objects are in contact!")
 
     def close(self) -> None:
         """Close the simulation."""
@@ -163,6 +166,9 @@ class BulletSim(Simulation):
         self.create_sphere(np.zeros(3))
         if self.orientation_task:
             self.create_orientation_mark(np.zeros(3))
+        self._bodies_idx['shelf'] = self.physics_client.loadSDF(
+            "/Users/eminsafatok/dev/RoboRL-Navigator/assets/object_models/simple_shelf.sdf"
+        )[0]
 
     def create_geometry(
         self,
@@ -187,6 +193,7 @@ class BulletSim(Simulation):
             baseMass=mass,
             basePosition=position,
         )
+
 
     def create_box(
         self,

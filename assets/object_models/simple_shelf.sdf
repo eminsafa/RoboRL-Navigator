@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+    <world name='default'>
+        <model name="Amazon Pod">
+            <static>1</static>
+            <pose>0 0 0 0 0 0</pose>
+            <link name="some_link">
+                <visual name="pod_visual">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <mesh>
+                            <uri>simple_shelf.stl</uri>
+                            <scale>0.03 0.03 0.03</scale>
+                        </mesh>
+                    </geometry>
+                    <collision>
+                        <pose>0 0 0 0 0 0</pose>
+                        <geometry>
+                            <mesh>
+                                <uri>simple_shelf.stl</uri>
+                                <scale>0.03 0.03 0.03</scale>
+                            </mesh>
+                        </geometry>
+                    </collision>
+                    <material>
+                        <diffuse>0.9 0.8 0.5 1</diffuse>
+                    </material>
+                </visual>
+            </link>
+        </model>
+    </world>
+</sdf>
