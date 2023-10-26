@@ -1,4 +1,6 @@
+import math
 import os
+import time
 from contextlib import contextmanager
 from typing import Any, Dict, Iterator, Optional
 
@@ -6,8 +8,9 @@ import numpy as np
 import pybullet as p
 import pybullet_data
 import pybullet_utils.bullet_client as bc
-
 from roborl_navigator.simulation import Simulation
+from roborl_navigator.utils import euler_to_quaternion
+from roborl_navigator.utils.collision_helper import NamedCollisionObject, CollisionDetector
 
 
 class BulletSim(Simulation):
@@ -47,14 +50,27 @@ class BulletSim(Simulation):
         self.physics_client.setAdditionalSearchPath(pybullet_data.getDataPath())
         self.physics_client.setGravity(0, 0, -9.81)
         self._bodies_idx = {}
+        self.controller = 0
+        self.once = False
 
     def step(self) -> None:
-        """Step the simulation."""
+        """Step the simulation.
+        {'panda': 0, 'plane': 1, 'shelf': 4, 'table': 2, 'target': 3}
+        """
+
         for _ in range(self.n_substeps):
             self.physics_client.stepSimulation()
-        contacts = p.getContactPoints(bodyA=self._bodies_idx['panda'], bodyB=self._bodies_idx['shelf'])
-        if contacts:  # If the list is not empty, there's a collision
-            print("Objects are in contact!")
+        self.controller += 1
+        if self.controller > 309:
+            contact_points = p.getContactPoints(bodyA=0, bodyB=4)
+            if contact_points != ():
+                print(f"\n\n\n{contact_points}\n\n\n")
+            for i in [0, 1, 2, 3]:
+                result = p.getClosestPoints(i, 4, distance=0.0)
+                if result != ():
+                    print(f"result: ok, {i}")
+        # time.sleep(0.2)
+
 
     def close(self) -> None:
         """Close the simulation."""
@@ -166,9 +182,15 @@ class BulletSim(Simulation):
         self.create_sphere(np.zeros(3))
         if self.orientation_task:
             self.create_orientation_mark(np.zeros(3))
-        self._bodies_idx['shelf'] = self.physics_client.loadSDF(
-            "/Users/eminsafatok/dev/RoboRL-Navigator/assets/object_models/simple_shelf.sdf"
-        )[0]
+        self.create_shelf()
+        # self.create_box(
+        #     body_name="test",
+        #     half_extents=np.array([0.1, 0.1, 0.1]),
+        #     position=np.array([0.65, 0, 0.1]),
+        #     rgba_color=np.array([0.5, 0.21, 0.95, 1]),
+        # )
+        # print(p.getJointInfo(0, 8)[12].decode('utf-8'))
+
 
     def create_geometry(
         self,
@@ -251,7 +273,7 @@ class BulletSim(Simulation):
         self.create_geometry(
             "target",
             geom_type=self.physics_client.GEOM_SPHERE,
-            mass=0.0,
+            mass=1.0,
             position=position,
             ghost=True,
             visual_kwargs=visual_kwargs,
@@ -279,3 +301,25 @@ class BulletSim(Simulation):
         # p.addUserDebugLine([0, 0, 0], [line_length, 0, 0], [1, 0, 0], parentObjectUniqueId=oid, parentLinkIndex=10)
         # p.addUserDebugLine([0, 0, 0], [0, line_length, 0], [0, 1, 0], parentObjectUniqueId=oid, parentLinkIndex=10)
         # p.addUserDebugLine([0, 0, 0], [0, 0, line_length], [0, 0, 1], parentObjectUniqueId=oid, parentLinkIndex=10)
+
+    def create_shelf(self):
+        shelf_path_sdf = "/home/juanhernandezvega/dev/RoboRL-Navigator/assets/object_models/shelf_lab.sdf"
+        shelf_path_obj = "/home/juanhernandezvega/dev/RoboRL-Navigator/assets/object_models/shelf_lab.obj"
+        self._bodies_idx['shelf'] = self.physics_client.loadSDF(
+            shelf_path_sdf,
+        )[0]
+        # # Create a collision shape from the STL mesh
+        # collision_shape_id = p.createCollisionShape(
+        #     shapeType=p.GEOM_MESH,
+        #     fileName=shelf_path_obj,
+        #     meshScale=[1, 1, 1],
+        # )
+        #
+        # # Attach the collision shape to the object
+        # p.createMultiBody(
+        #     baseMass=0,
+        #     baseCollisionShapeIndex=collision_shape_id,
+        #     basePosition=[0.65, 0, 0],
+        #     # baseOrientation=euler_to_quaternion([0, 0, math.pi/2])
+        # )
+
