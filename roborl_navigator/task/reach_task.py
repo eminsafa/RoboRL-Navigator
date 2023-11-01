@@ -51,6 +51,15 @@ class Reach:
 
     def reset(self) -> None:
         self.goal = self._sample_goal()
+<<<<<<< HEAD
+=======
+        self.sim.set_base_pose(
+            "shelf",
+            np.array([self.shelf_distance, 0, 0]),
+            euler_to_quaternion([0, 0, math.pi/2]),
+        )
+
+>>>>>>> 4f34608ddcab5a1d4cd2bd86e99621bdf1e4add9
         if not self.demonstration:
             self.sim.set_base_pose("target", self.goal[:3], np.array([0.0, 0.0, 0.0, 1.0]))
             if self.orientation_task:

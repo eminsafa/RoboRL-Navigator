@@ -12,7 +12,7 @@ env.reset()
 action = np.ones(7)
 observation, reward, terminated, truncated, info = env.step(action)
 action = np.zeros(7)
-for i in range(1_000):
+for i in range(10_000):
     action = env.action_space.sample()
     observation, reward, terminated, truncated, info = env.step(action)
     if i % 50 == 0:

@@ -9,16 +9,16 @@
                     <pose>0 0 0 0 0 0</pose>
                     <geometry>
                         <mesh>
-                            <uri>simple_shelf.stl</uri>
-                            <scale>0.03 0.03 0.03</scale>
+                            <uri>shelf_lab.stl</uri>
+                            <scale>1 1 1</scale>
                         </mesh>
                     </geometry>
                 <collision>
                     <pose>0 0 0 0 0 0</pose>
                     <geometry>
                         <mesh>
-                            <uri>simple_shelf.stl</uri>
-                            <scale>0.03 0.03 0.03</scale>
+                            <uri>shelf_lab.stl</uri>
+                            <scale>1 1 1</scale>
                         </mesh>
                     </geometry>
                 </collision>
