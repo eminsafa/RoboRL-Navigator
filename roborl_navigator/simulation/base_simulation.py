@@ -14,7 +14,7 @@ class Simulation(ABC):
         self.render_mode = render_mode
         self.n_substeps = n_substeps
         self.timestep = 1.0 / 500
-        self._bodies_idx = {}
+        self.bodies_idx = {}
 
     @property
     def dt(self):
