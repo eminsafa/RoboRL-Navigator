@@ -28,6 +28,10 @@ from sensor_msgs.msg import (
 )
 from tf import TransformListener
 from tf.transformations import quaternion_from_euler
+import cv2
+import matplotlib.pyplot as plt
+import actionlib
+import franka_gripper.msg
 
 
 class ROSController:
@@ -56,7 +60,8 @@ class ROSController:
         self.latest_grasp_result_path = None
         self.graspnet_url = "http://localhost:5000/run?path={path}"
 
-        self.capture_joint_degrees = [0, -1.5, 0, -2.5, 0, 1.728, 0.7854]
+        self.capture_joint_degrees = [0.064, -1.7, -0.034, -1.75, -0.105, 1.236, 0.743]
+        # 0.064, -1.8, -0.034, -1.72, -0.105, 1.236, 0.743
         self.neutral_joint_values = [0.0, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77]
         self.up_joints = [0.0, 0.0, 0.0, -1.78, 0.0, 2.24, 0.77]
         self.relase_joint_values = [1.39, 0.4, 0.0, -1.78, 0.0, 2.24, 0.77]
@@ -68,13 +73,36 @@ class ROSController:
 
     def hand_open(self) -> None:
         # values -> {'panda_finger_joint1': 0.035, 'panda_finger_joint2': 0.035}
-        self.hand_group.set_joint_value_target(self.hand_group.get_named_target_values("open"))
-        self.hand_group.go(wait=True)
+        open_joint_positions = [0.04, 0.04]  # Specify joint positions for the open gripper
+        self.hand_group.go(open_joint_positions, wait=True)
+        self.hand_group.stop()
+        rospy.sleep(1.0) 
 
     def hand_close(self) -> None:
-        # values -> {'panda_finger_joint1': 0.0, 'panda_finger_joint2': 0.0}
-        self.hand_group.set_joint_value_target(self.hand_group.get_named_target_values("close"))
-        self.hand_group.go(wait=True)
+        # Creates the SimpleActionClient, passing the type of the action
+        # (GraspAction) to the constructor.
+        client = actionlib.SimpleActionClient('/franka_gripper/grasp', franka_gripper.msg.GraspAction)
+
+        # Waits until the action server has started up and started
+        # listening for goals.
+        client.wait_for_server()
+
+        # Creates a goal to send to the action server.
+        goal = franka_gripper.msg.GraspGoal()
+        goal.width = 0.04
+        goal.epsilon.inner = 0.04
+        goal.epsilon.outer = 0.04
+        goal.speed = 0.1
+        goal.force = 5
+
+        # Sends the goal to the action server.
+        client.send_goal(goal)
+
+        # Waits for the server to finish performing the action.
+        client.wait_for_result()
+
+        # Prints out the result of executing the action
+        return client.get_result()  # A GraspResult
 
     def hand_grasp(self) -> None:
         target_values = {f'{self.robot_name}_finger_joint1': 0.006, f'{self.robot_name}_finger_joint2': 0.006}
@@ -157,6 +185,7 @@ class ROSController:
 
     def rgb_callback(self, msg: Any) -> None:
         self.rgb_array = self.cv_bridge.imgmsg_to_cv2(msg, "bgr8")
+        self.rgb_array = cv2.cvtColor(self.rgb_array, cv2.COLOR_BGR2RGB)
         time.sleep(1)
 
     def depth_callback(self, msg: Any) -> None:
@@ -175,23 +204,109 @@ class ROSController:
         )
         time.sleep(1)
 
-    def capture_image_and_save_info(self) -> str:
+    # def capture_image_and_save_info(self) -> str:
+    #     rospy.Subscriber("/camera/color/image_raw", Image, self.rgb_callback)
+    #     rospy.Subscriber("/camera/aligned_depth_to_color/image_raw", Image, self.depth_callback)
+    #     rospy.Subscriber("/camera/aligned_depth_to_color/camera_info", CameraInfo, self.camera_info_callback)
+    #     rospy.sleep(5)
+    #     data_dict = {
+    #         "rgb": np.array(self.rgb_array),
+    #         "depth": np.array(self.depth_array) / 1000.0,
+    #         "label": np.zeros((720, 1280), dtype=np.uint8),
+    #         "K": self.camera_info
+    #     }
+    #     np.save(self.save_dir + '/data.npy', data_dict)
+    #     np.save(self.save_dir + "/rgb.npy", np.array(self.rgb_array))
+    #     np.save(self.save_dir + "/depth.npy", np.array(self.depth_array) / 1000.0)
+    #     self.latest_capture_path = self.save_dir + '/data.npy'
+    #     print("Data saved on", self.latest_capture_path)
+    #     return self.latest_capture_path
+        
+    def filter_color(self, color_img: np.ndarray, depth_data: np.ndarray) -> np.ndarray:
+        lower_white = np.array([0, 0, 168])
+        upper_white = np.array([172, 111, 255])
+        lower_brown = np.array([15, 30, 100])
+        upper_brown = np.array([25, 160, 255])
+
+#         lower_cream_precise = np.array([15, 30, 100])  # Narrower S and V ranges
+# upper_cream_precise = np.array([25, 150, 255])  # Slightly narrower H range
+        hsv_image = cv2.cvtColor(color_img, cv2.COLOR_RGB2HSV)
+        mask_red = cv2.inRange(hsv_image, lower_white, upper_white)
+        mask_brown = cv2.inRange(hsv_image, lower_brown, upper_brown)
+        mask_combined = cv2.bitwise_or(mask_red, mask_brown)
+        mask_non_red_brown = cv2.bitwise_not(mask_combined)
+        plt.imshow(hsv_image)
+        plt.axis('off')  # Turn off axes
+        plt.show()
+        # Define HSV range for white color
+        # lower_white = np.array([0, 0, 168])
+        # upper_white = np.array([172, 111, 255])
+
+        # # Define HSV range for cream color (light shade of brown/orange)
+        # lower_cream = np.array([15, 50, 170]) # these values can be adjusted
+        # upper_cream = np.array([30, 150, 255])
+
+        # # Create masks for white and cream colors
+        # mask_white = cv2.inRange(color_img, lower_white, upper_white)
+        # mask_cream = cv2.inRange(color_img, lower_cream, upper_cream)
+
+        # # Combine masks for white and cream colors
+        # mask_combined = cv2.bitwise_or(mask_white, mask_cream)
+
+        # # Invert mask to filter out the white and cream colors
+        # mask_non_red_brown = cv2.bitwise_not(mask_combined)
+
+
+
+
+
+
+        plt.imshow(mask_non_red_brown)
+        plt.axis('off')  # Turn off axes
+        plt.show()
+        non_red_brown_objects_hsv = cv2.bitwise_and(
+            color_img, color_img, mask=mask_non_red_brown
+        )
+        filtered_depth_data = cv2.bitwise_and(
+            depth_data, depth_data, mask=mask_non_red_brown
+        )
+        return filtered_depth_data
+    
+    def capture_image_and_save_info(self, dir_name: Optional[str] = None) -> str:
         rospy.Subscriber("/camera/color/image_raw", Image, self.rgb_callback)
-        rospy.Subscriber("/camera/aligned_depth_to_color/image_raw", Image, self.depth_callback)
-        rospy.Subscriber("/camera/aligned_depth_to_color/camera_info", CameraInfo, self.camera_info_callback)
+        rospy.Subscriber(
+            "/camera/aligned_depth_to_color/image_raw", Image, self.depth_callback
+        )
+        rospy.Subscriber(
+            "/camera/aligned_depth_to_color/camera_info",
+            CameraInfo,
+            self.camera_info_callback,
+        )
         rospy.sleep(5)
+        filtered_depth_array = self.filter_color(
+            np.array(self.rgb_array), np.array(self.depth_array)
+        )
         data_dict = {
             "rgb": np.array(self.rgb_array),
-            "depth": np.array(self.depth_array) / 1000.0,
+            "depth_raw": self.depth_array / 1000.0,
+            "depth": filtered_depth_array / 1000.0,
             "label": np.zeros((720, 1280), dtype=np.uint8),
-            "K": self.camera_info
+            "K": self.camera_info,
         }
+        # Display the image
+        
+
+        # plt.imshow(self.rgb_array)
+        # plt.axis('off')  # Turn off axes
+        # plt.show()
         np.save(self.save_dir + '/data.npy', data_dict)
         np.save(self.save_dir + "/rgb.npy", np.array(self.rgb_array))
-        np.save(self.save_dir + "/depth.npy", np.array(self.depth_array) / 1000.0)
+        np.save(self.save_dir + "/depth.npy", np.array(filtered_depth_array) / 1000.0)
         self.latest_capture_path = self.save_dir + '/data.npy'
         print("Data saved on", self.latest_capture_path)
         return self.latest_capture_path
+
+
 
     def view_image(self) -> None:
         file_path = self.save_dir + '/rgb.npy'
